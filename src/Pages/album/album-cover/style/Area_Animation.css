@@ -1,0 +1,29 @@
+
+/* =========================
+   ÁREA DE CLIQUE / HOVER
+========================= */
+
+.area_animacao {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: 30%;
+  height: 100dvh;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  z-index: 50;
+}
+
+
+@media (max-width: 1000px) {
+ .area_animacao {
+    width: 100%;
+  }
+}

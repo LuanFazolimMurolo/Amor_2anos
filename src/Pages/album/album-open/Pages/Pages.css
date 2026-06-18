@@ -1,0 +1,39 @@
+/* =========================
+   CAMADA FIXA DAS LINHAS
+========================= */
+
+
+
+.album-gallery-section {
+  width: 100%;
+  height: 100dvh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+
+  scroll-snap-align: start;
+
+  font-family: "Chau Philomene One", sans-serif;
+  font-size: 3rem;
+}
+
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+
+
+
+ @media (max-width: 1000px) {
+  .album-gallery-section {
+    padding: 0 24px;
+
+    font-size: 2rem;
+    text-align: center;
+
+    box-sizing: border-box;
+  }
+
+ }

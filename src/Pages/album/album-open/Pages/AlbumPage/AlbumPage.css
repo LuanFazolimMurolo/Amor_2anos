@@ -1,0 +1,58 @@
+/* =========================
+   PÁGINA DE CADA MÊS
+========================= */
+
+.album-month-page {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100dvh;
+
+  overflow: hidden;
+}
+
+/* Título do mês */
+.album-month-title {
+  position: relative;
+
+  width: 100%;
+  height: 18%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  z-index: 10;
+}
+
+.album-month-title h1 {
+  margin: 0;
+
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.8;
+}
+
+.album-month-title p {
+  margin: 0;
+
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-style: italic;
+}
+
+/* Área onde as figurinhas ficam posicionadas */
+.album-stickers-area {
+  position: relative;
+
+  width: 100vw;
+  height: 82%;
+
+  /*background-color: red;*/
+
+  overflow: hidden;
+}

@@ -1,0 +1,22 @@
+.container {
+  height: 100vh;
+  overflow-y: scroll;
+
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+
+.section {
+  min-height: 100dvh;
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  
+}

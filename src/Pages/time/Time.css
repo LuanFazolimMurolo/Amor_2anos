@@ -1,0 +1,246 @@
+.time-container{
+    background-color: #000000;
+    position: relative;
+
+    width: 100%;
+    height: 100dvh;
+
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.decor-top-left,
+.decor-bottom-right {
+  position: absolute;
+  width: 350px;
+  height: 220px;
+  pointer-events: none;
+}
+
+.decor-top-left {
+  top: 1%;
+  left: 0;
+  
+}
+
+.decor-bottom-right {
+  bottom: 1%;
+  right: 0;
+
+  transform: rotate(180deg);
+}
+
+.decor-top-left svg,
+.decor-bottom-right svg {
+  width: 70%;
+  height: 100%;
+  border-radius: 60px
+
+}
+
+.decor-top-left path,
+.decor-bottom-right path {
+  fill: none;
+
+  stroke: #d9b18c;
+  stroke-width: 16;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 768px) {
+  .decor-top-left,
+  .decor-bottom-right {
+    width: 200px;
+    height: 150px;
+  }
+}
+
+@font-face {
+  font-family: "Chau Philomene One";
+  src: url("../../Fonts/ChauPhilomeneOne-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+.iloveyous {
+  position: absolute;
+  top: 0;
+  min-height: 100%;
+  
+  padding: 60px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: space-between;
+  color: #d4ac85;
+  opacity: 0.6;
+  font-family: "Chau Philomene One", sans-serif;
+  z-index: 3;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 10px;
+  font-style: italic;
+}
+
+
+.left {
+  left: 5px;
+  align-items: flex-start;
+}
+
+.right {
+  right: 2px;
+
+  align-items: flex-end;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .iloveyous {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    padding: 30px 0;    
+  }
+}
+
+@media (max-width: 1000px) and (min-width: 769px) {
+  .iloveyous {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
+}
+
+.iloveyous p{
+  animation: fadeIn 2s ease-in-out infinite alternate;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0.08;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+
+
+.textos_informacoes{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    transform: translate(-50%, -50%);
+    color: #d4ac85;
+    font-size: 2rem;
+    font-family: "Chau Philomene One", sans-serif;    
+    text-align: center;
+    text-shadow: 1px 1px 0px rgb(0, 0, 0);
+    
+}
+
+.textos_informacoes.aniversario{
+    opacity: 0.3;
+}
+
+.data-hoje h3, .iloveyou-random h3{
+
+    font-size: 1.5rem;
+    font-style: italic;
+    line-height: 1;
+    font-weight: 100;
+
+}
+
+.tempo-faltando{
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;  
+
+    }
+
+@media (max-width: 768px) {
+    .textos_informacoes{
+        gap:20px;
+    }
+    .data-hoje h3, .iloveyou-random h3{
+        font-size: 1rem;
+        
+    }
+    .tempo-faltando{
+        max-width: 300px;
+        flex-direction: column;
+        align-items: center;
+        
+        gap: 0px;  
+        line-height: 1.08;
+
+    }
+}
+
+
+
+.flor-animacao {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1000px; /* ajuste */
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.03;
+}
+
+@media (max-width: 768px) {
+  .flor-animacao {
+    width: 500px;
+    opacity: 0.02;
+  }
+}
+
+
+.anos{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Chau Philomene One", sans-serif;    
+    opacity: 0.01;
+    font-size: 15rem;
+    font-weight: bold;
+    color: #d4ac85;
+    text-shadow: 2px 2px 0px rgb(0, 0, 0);
+    z-index: 2;
+    line-height: 1;
+
+
+}
+.anos p{
+    font-size: 0.37em;
+    font-style: italic;
+    font-weight: 100;
+    opacity: 0;
+
+    
+}
+.anos.aniversario{
+    opacity: 1;
+    z-index: 4;
+}
+.anos.aniversario p{
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .anos{
+        font-size: 4.3rem;
+        opacity: 0.03;
+
+        
+    }
+}
