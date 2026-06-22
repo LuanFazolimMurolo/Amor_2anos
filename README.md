@@ -1,16 +1,37 @@
-# React + Vite
+Instalação
+Pré-requisitos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Antes de começar, tenha instalado na máquina:
 
-Currently, two official plugins are available:
+Node.js
+npm
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Para verificar se já está instalado:
 
-## React Compiler
+node -v
+npm -v
+Baixar o projeto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Clone o repositório:
 
-## Expanding the ESLint configuration
+git clone URL_DO_REPOSITORIO
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Entre na pasta do projeto:
+
+cd frontend
+Instalar dependências
+
+Instale todas as dependências do projeto:
+
+npm install
+
+Esse comando recria automaticamente a pasta node_modules.
+
+A pasta node_modules não deve ser enviada para o GitHub.
+
+Configurar variáveis de ambiente
+
+Crie um arquivo chamado .env.local na raiz do projeto:
+
+VITE_SUPABASE_URL=SUA_URL_DO_SUPABASE
+VITE_SUPABASE_ANON_KEY=SUA_CHAVE_ANON_DO_SUPABASE
