@@ -1,0 +1,26 @@
+.Open_packet_container{
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 100%;
+    height: 100dvh;
+    background-color: rgba(0, 0, 0, 0.656);
+    z-index: 10;
+
+    
+}
+
+.Open_packet_container img{
+    width: 400px;
+}
+
+
+
+
+
+@media (max-width: 1000px){
+    .Open_packet_container img{
+        width: 60vw;
+    }
+    
+}
