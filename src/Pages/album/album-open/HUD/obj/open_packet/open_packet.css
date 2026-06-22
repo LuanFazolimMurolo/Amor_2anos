@@ -1,7 +1,7 @@
 .Open_packet_container{
     margin: 0;
     padding: 0;
-    border: none;
+    border: 0;
     width: 100%;
     height: 100dvh;
     background-color: rgba(0, 0, 0, 0.656);
