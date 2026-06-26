@@ -5,7 +5,7 @@ import Fireworks from "../hooks/Fireworks.jsx";
 
 import { useRef, useEffect, useState, memo } from "react";
 
-import { iloveyousDay }  from './js/iloveyous.jsx';
+import { getTodayIloveyou }  from './js/iloveyous.js';
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -37,27 +37,41 @@ const Iloveyous = memo(function Iloveyous() {
 function App() {
 
   const sectionRef = useRef(null);
-
+  const IloveyouToday = getTodayIloveyou();
   const topLineRef = useRef(null);
   const bottomLineRef = useRef(null);
-
   const [timeData, setTimeData] = useState(getDateAndCountdown());
-
+  const [iloveyouToday, setIloveyouToday] = useState(null);
+  const [loadingIloveyou, setLoadingIloveyou] = useState(true);
   // MISSING TIME
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeData(getDateAndCountdown());
-      iloveyousDay;
     }, 1000);
     
-      console.log(iloveyousDay())
       console.log(JSONiloveyous.iloveyouDay)
 
 
     return () => clearInterval(interval);
   }, []);
 
-  
+  useEffect(() => {
+    async function loadIloveyouToday() {
+      try {
+        const data = await getTodayIloveyou();
+
+        console.log("Palavra do dia:", data);
+
+        setIloveyouToday(data.word);
+      } catch (error) {
+        console.error("Erro ao buscar palavra do dia:", error);
+      } finally {
+        setLoadingIloveyou(false);
+      }
+    }
+
+    loadIloveyouToday();
+  }, []);
 
   // FLOR A
 
@@ -102,7 +116,11 @@ function App() {
         </div>
 
          <div className="iloveyou-random">
-            <h3>Eu Te Amo</h3>
+            {loadingIloveyou ? (
+            <h3>Carregando...</h3>
+          ) : (
+            <h3>{iloveyouToday?.word}</h3>
+          )}
 
         </div>
       
