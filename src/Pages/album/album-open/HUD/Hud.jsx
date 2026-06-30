@@ -6,7 +6,7 @@ import OpenPacket from "./obj/open_packet/open_packet.jsx";
 
 import { useState } from "react";
 
-function HUD({ coverRef, galleryRef, setAlbumOpen }) {
+function HUD({ coverRef, galleryRef, setAlbumOpen, packets}) {
   const [openPacket, setOpenPacket] = useState(false);
 
   function abrirPacote() {
@@ -16,7 +16,7 @@ function HUD({ coverRef, galleryRef, setAlbumOpen }) {
 
   return (
     <div className="hud-container">
-      {!openPacket ? <Packet onClick={abrirPacote} /> : null}
+      {!openPacket ? <Packet onClick={abrirPacote} packets={packets}/> : null}
       {openPacket && <OpenPacket />}
       <Back
         coverRef={coverRef}

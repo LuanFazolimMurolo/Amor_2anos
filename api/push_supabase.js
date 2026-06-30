@@ -1,28 +1,31 @@
 import { supabaseAdmin } from "../server/config/supabaseAdmin.js";
 
-
-// PEGANDO TODOS OS VALORES DO BD
+// ======================================================
+// PEGANDO TODOS OS VALORES DA TABELA iloveyous
+// ======================================================
 export async function getIloveyousData() {
-    const { data: words, error } = await supabaseAdmin
-      .from("iloveyous")
-      .select("*")
-      .order("id", { ascending: true });
+  const { data: words, error } = await supabaseAdmin
+    .from("iloveyous")
+    .select("*")
+    .order("id", { ascending: true });
 
-    if (error) {
-      throw error;
-    }
-
-    return {
-      words,
-    };
+  if (error) {
+    throw error;
   }
 
+  return {
+    words,
+  };
+}
 
-
-// ORGANIZANDO A DATA DE HOJE
+// ======================================================
+// PEGANDO A DATA DE HOJE NO HORÁRIO DO BRASIL
+// Retorna no formato do Supabase: YYYY-MM-DD
+// Exemplo: 2026-06-30
+// ======================================================
 function getTodayDateBR() {
   const parts = new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo", 
+    timeZone: "America/Sao_Paulo",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -32,164 +35,211 @@ function getTodayDateBR() {
   const month = parts.find((part) => part.type === "month").value;
   const year = parts.find((part) => part.type === "year").value;
 
-
-  // -Retorna a data no formato ano-mês-dia
   return `${year}-${month}-${day}`;
 }
 
-
+// ======================================================
 // SORTEANDO UM ITEM ALEATÓRIO
+// ======================================================
 function sortRandomItem(items) {
   const randomIndex = Math.floor(Math.random() * items.length);
   return items[randomIndex];
 }
 
-
+// ======================================================
+// PEGANDO / SORTEANDO A PALAVRA DO DIA
+// ======================================================
 export async function getTodayIloveyou() {
-    const todayDate = getTodayDateBR();
+  const todayDate = getTodayDateBR();
 
-    // VERIFICANDO SE JÁ EXISTE UMA PALAVRA ESCOLHIDA PARA HOJE
-      // -Puxa a palavra que está marcada como today true
-      // -Confere se a selected_date é igual à data de hoje
-    const { data: currentTodayWord, error: currentTodayError } =
-      await supabaseAdmin
-        .from("iloveyous")
-        .select("*")  
-        .eq("today", true)
-        .eq("selected_date", todayDate)
-        .maybeSingle();
-
-    if (currentTodayError) {
-      throw currentTodayError;
-    }
-
-      // -Se já existir uma palavra escolhida hoje, retorna ela sem sortear outra
-    if (currentTodayWord) {
-      return {
-        word: currentTodayWord,
-        alreadySelectedToday: true,
-      };
-    }
-  
-
-    // LIMPANDO A PALAVRA DO DIA ANTERIOR
-      // -Todas as palavras que ainda estiverem com today true voltam para false
-    const { error: clearTodayError } = await supabaseAdmin
+  // Verifica se já existe uma palavra escolhida para hoje
+  const { data: currentTodayWord, error: currentTodayError } =
+    await supabaseAdmin
       .from("iloveyous")
-      .update({ today: false })
-      .eq("today", true);
+      .select("*")
+      .eq("today", true)
+      .eq("selected_date", todayDate)
+      .maybeSingle();
 
-    if (clearTodayError) {
-      throw clearTodayError;
+  if (currentTodayError) {
+    throw currentTodayError;
+  }
+
+  // Se já existir palavra de hoje, retorna ela
+  if (currentTodayWord) {
+    return {
+      word: currentTodayWord,
+      alreadySelectedToday: true,
+    };
+  }
+
+  // Limpa palavras antigas marcadas como today
+  const { error: clearTodayError } = await supabaseAdmin
+    .from("iloveyous")
+    .update({ today: false })
+    .eq("today", true);
+
+  if (clearTodayError) {
+    throw clearTodayError;
+  }
+
+  // Busca palavras ainda não usadas
+  let { data: availableWords, error: availableWordsError } = await supabaseAdmin
+    .from("iloveyous")
+    .select("*")
+    .eq("used", false);
+
+  if (availableWordsError) {
+    throw availableWordsError;
+  }
+
+  // Se todas já foram usadas, reseta o ciclo
+  if (!availableWords || availableWords.length === 0) {
+    const { error: resetError } = await supabaseAdmin
+      .from("iloveyous")
+      .update({
+        used: false,
+        today: false,
+        selected_date: null,
+      })
+      .gt("id", 0);
+
+    if (resetError) {
+      throw resetError;
     }
 
-
-    // BUSCANDO PALAVRAS QUE AINDA NÃO FORAM USADAS
-      // -Seleciona todas as palavras que estão com used false
-    let { data: availableWords, error: availableWordsError } = await supabaseAdmin
+    const { data: resetWords, error: resetWordsError } = await supabaseAdmin
       .from("iloveyous")
       .select("*")
       .eq("used", false);
 
-    if (availableWordsError) {
-      throw availableWordsError;
-    }
-    
-
-    // RESETANDO O CICLO CASO TODAS JÁ TENHAM SIDO USADAS
-      // -Se não existir nenhuma palavra disponível, todas voltam para used false
-      // -Também limpa today e selected_date para começar um novo ciclo
-    if (!availableWords || availableWords.length === 0) {
-      const { error: resetError } = await supabaseAdmin
-        .from("iloveyous")
-        .update({
-          used: false,
-          today: false,
-          selected_date: null,
-        })
-        .gt("id", 0);
-
-      if (resetError) {
-        throw resetError;
-      }
-
-
-      // BUSCANDO AS PALAVRAS NOVAMENTE APÓS O RESET
-        // -Depois de resetar, busca de novo todas as palavras disponíveis
-      const { data: resetWords, error: resetWordsError } = await supabaseAdmin
-        .from("iloveyous")
-        .select("*")
-        .eq("used", false);
-
-      if (resetWordsError) {
-        throw resetWordsError;
-      }
-
-      availableWords = resetWords;
+    if (resetWordsError) {
+      throw resetWordsError;
     }
 
+    availableWords = resetWords;
+  }
 
-    // SORTEANDO A NOVA PALAVRA DO DIA
-      // -Escolhe aleatoriamente uma palavra da lista de palavras disponíveis
-    const selectedWord = sortRandomItem(availableWords);
+  // Sorteia uma palavra
+  const selectedWord = sortRandomItem(availableWords);
 
+  // Atualiza a palavra sorteada no banco
+  const { data: updatedWord, error: updateError } = await supabaseAdmin
+    .from("iloveyous")
+    .update({
+      used: true,
+      today: true,
+      selected_date: todayDate,
+    })
+    .eq("id", selectedWord.id)
+    .select("*")
+    .single();
 
-    // ATUALIZANDO A PALAVRA SORTEADA NO BD
-      // -Marca a palavra como usada
-      // -Marca a palavra como a palavra de hoje
-      // -Salva a data em que ela foi escolhida
-    const { data: updatedWord, error: updateError } = await supabaseAdmin
-      .from("iloveyous")
-      .update({
-        used: true,
-        today: true,
-        selected_date: todayDate,
-      })
-      .eq("id", selectedWord.id)
-      .select("*")
-      .single();
+  if (updateError) {
+    throw updateError;
+  }
 
-    if (updateError) {
-      throw updateError;
-    }
-
-
-    // RETORNANDO A PALAVRA ESCOLHIDA
-      // -Retorna a nova palavra do dia
-      // -Informa que ela acabou de ser selecionada hoje
-    return {
-      word: updatedWord,
-      alreadySelectedToday: false,
-    };
+  return {
+    word: updatedWord,
+    alreadySelectedToday: false,
+  };
 }
 
-
+// ======================================================
+// PEGANDO TODOS OS PACKETS DO BANCO
+// ======================================================
 export async function getPackets() {
   const { data: packets, error } = await supabaseAdmin
-      .from("packets")
-      .select("*")
-      .order("id", { ascending: true });
+    .from("packets")
+    .select("*")
+    .order("id", { ascending: true });
 
-    if (error) {
-      throw error;
-    }
+  if (error) {
+    throw error;
+  }
 
-    return {
-      packets,
-    };
+  return {
+    packets,
+  };
 }
 
-export async function postPackets() {
-  const { data: packets, error } = await supabaseAdmin
-      .from("packets")
-      .select("*")
-      .order("id", { ascending: true });
+// ======================================================
+// CONVERTE DD-MM-YYYY PARA YYYY-MM-DD
+// Exemplo:
+// 18-05-2026 vira 2026-05-18
+// ======================================================
+function formatToSupabaseDate(date) {
+  const [day, month, year] = date.split("-");
+  return `${year}-${month}-${day}`;
+}
 
-    if (error) {
-      throw error;
-    }
-
+// ======================================================
+// ADICIONA PACKETS QUE ESTÃO FALTANDO
+// Recebe datas em DD-MM-YYYY
+// Salva no Supabase em YYYY-MM-DD
+// ======================================================
+export async function postPackets(datesToAdd) {
+  if (!Array.isArray(datesToAdd) || datesToAdd.length === 0) {
     return {
-      packets,
+      packets: [],
+      message: "Nenhum packet novo para adicionar.",
     };
+  }
+
+  const rowsToInsert = datesToAdd.map((date) => {
+    return {
+      used: true,
+      created_at: formatToSupabaseDate(date),
+    };
+  });
+
+  const { data, error } = await supabaseAdmin
+    .from("packets")
+    .upsert(rowsToInsert, {
+      onConflict: "created_at",
+      ignoreDuplicates: true,
+    })
+    .select();
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    packets: data,
+    message: "Packets adicionados com sucesso.",
+  };
+}
+
+// ======================================================
+// DELETA PACKETS QUE NÃO DEVERIAM MAIS EXISTIR
+// Recebe datas em DD-MM-YYYY
+// Deleta no Supabase usando YYYY-MM-DD
+// ======================================================
+export async function deletePacketsByDates(datesToDelete) {
+  if (!Array.isArray(datesToDelete) || datesToDelete.length === 0) {
+    return {
+      deleted: [],
+      message: "Nenhum packet para deletar.",
+    };
+  }
+
+  const datesFormatted = datesToDelete.map((date) => {
+    return formatToSupabaseDate(date);
+  });
+
+  const { data, error } = await supabaseAdmin
+    .from("packets")
+    .delete()
+    .in("created_at", datesFormatted)
+    .select();
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    deleted: data,
+    message: "Packets deletados com sucesso.",
+  };
 }

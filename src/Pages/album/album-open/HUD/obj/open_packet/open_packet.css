@@ -1,26 +1,347 @@
-.Open_packet_container{
-    margin: 0;
-    padding: 0;
-    border: 0;
-    width: 100%;
-    height: 100dvh;
-    background-color: rgba(0, 0, 0, 0.656);
-    z-index: 10;
+.Open_packet_container {
+  --packet-light-1: #ffd166;
+  --packet-light-2: #ff4d6d;
+  --packet-light-3: #ff9f1c;
 
-    
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  width: 100%;
+  height: 100dvh;
+
+  background-color: rgba(0, 0, 0, 0.72);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  overflow: hidden;
 }
 
-.Open_packet_container img{
-    width: 400px;
+.packet_scene {
+  position: relative;
+
+  width: 100vw;
+  height: 100dvh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  perspective: 1000px;
 }
 
+.packet_wrapper {
+  position: relative;
 
+  width: min(400px, 60vw);
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  transform-style: preserve-3d;
+  z-index: 5;
+}
 
-@media (max-width: 1000px){
-    .Open_packet_container img{
-        width: 60vw;
-    }
-    
+.packet_body {
+  position: relative;
+  width: 100%;
+  z-index: 4;
+}
+
+.packet_body img {
+  width: 100%;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.packet_flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 34%;
+
+  overflow: hidden;
+  z-index: 8;
+
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 82%,
+    92% 78%,
+    84% 84%,
+    76% 76%,
+    68% 83%,
+    60% 77%,
+    52% 84%,
+    44% 76%,
+    36% 83%,
+    28% 77%,
+    20% 84%,
+    12% 76%,
+    0 82%
+  );
+}
+
+.packet_flap img {
+  width: 100%;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.packet_tear_line {
+  position: absolute;
+  top: 29%;
+  left: 50%;
+
+  width: 0%;
+  height: 18px;
+
+  transform: translateX(-50%);
+  z-index: 10;
+
+  opacity: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  pointer-events: none;
+}
+
+.packet_tear_line span {
+  display: block;
+
+  width: 30%;
+  height: 4px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border-radius: 999px;
+
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.9),
+    0 0 18px var(--packet-light-1);
+
+  transform: rotate(-5deg);
+}
+
+.packet_tear_line span:nth-child(2) {
+  transform: rotate(6deg);
+}
+
+.packet_tear_line span:nth-child(3) {
+  transform: rotate(-4deg);
+}
+
+/* Luz que sai de dentro do pacotinho */
+.packet_light {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+
+  width: 250px;
+  height: 180px;
+
+  transform: translateX(-50%) scale(0.2);
+
+  opacity: 0;
+
+  z-index: 6;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--packet-light-1) 0%,
+      var(--packet-light-2) 34%,
+      var(--packet-light-3) 58%,
+      transparent 72%
+    );
+
+  filter: blur(18px);
+
+  border-radius: 50%;
+
+  mix-blend-mode: screen;
+}
+
+.packet_light::before,
+.packet_light::after {
+  content: "";
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 360px;
+  height: 70px;
+
+  transform: translate(-50%, -50%) rotate(18deg);
+
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--packet-light-1) 45%,
+    transparent 100%
+  );
+
+  opacity: 0.75;
+
+  filter: blur(14px);
+
+  border-radius: 999px;
+}
+
+.packet_light::after {
+  transform: translate(-50%, -50%) rotate(-24deg);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--packet-light-2) 45%,
+    transparent 100%
+  );
+}
+
+.packet_light_core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 130px;
+  height: 90px;
+
+  transform: translate(-50%, -50%) scale(0.4);
+
+  opacity: 0;
+
+  background: radial-gradient(
+    circle,
+    #fff 0%,
+    var(--packet-light-1) 38%,
+    transparent 75%
+  );
+
+  filter: blur(7px);
+
+  border-radius: 50%;
+}
+
+/* Área invisível de onde as figurinhas saem */
+.packet_photos_area {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+
+  width: 1px;
+  height: 1px;
+
+  z-index: 20;
+
+  pointer-events: none;
+}
+
+/* Figurinhas maiores */
+.packet_photo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: clamp(170px, 18vw, 280px);
+  height: clamp(230px, 25vw, 380px);
+
+  transform: translate(-50%, -50%) scale(0.15);
+
+  opacity: 0;
+
+  border-radius: 16px;
+  overflow: hidden;
+
+  background-color: #fff;
+  padding: 9px;
+
+  box-shadow:
+    0 22px 45px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(255, 209, 102, 0.25);
+
+  pointer-events: none;
+}
+
+.packet_photo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  border-radius: 11px;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+.packet_photo_placeholder {
+  width: 100%;
+  height: 100%;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(135deg, #f4d7bb, #b98562);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Arial, sans-serif;
+  font-size: clamp(20px, 3vw, 36px);
+  font-weight: 700;
+  color: #3a2012;
+}
+
+@media (max-width: 1000px) {
+  .packet_wrapper {
+    width: 62vw;
+  }
+
+  .packet_photo {
+    width: 34vw;
+    height: 46vw;
+
+    max-width: 190px;
+    max-height: 260px;
+  }
+
+  .packet_light {
+    width: 220px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .packet_wrapper {
+    width: 68vw;
+  }
+
+  .packet_photo {
+    width: 38vw;
+    height: 52vw;
+  }
 }
