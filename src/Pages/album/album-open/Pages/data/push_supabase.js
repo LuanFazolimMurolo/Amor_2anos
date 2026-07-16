@@ -4,8 +4,9 @@ export async function getAlbumData() {
   const { data: cards, error: cardsError } = await supabase
     .from("album_cards")
     .select("*")
+    .order("order_index", { ascending: true })
     .order("id", { ascending: true });
-  
+
   if (cardsError) throw cardsError;
 
   const { data: myCards, error: myCardsError } = await supabase
@@ -13,6 +14,7 @@ export async function getAlbumData() {
     .select("*");
 
   if (myCardsError) throw myCardsError;
+
   return {
     cards,
     myCards,

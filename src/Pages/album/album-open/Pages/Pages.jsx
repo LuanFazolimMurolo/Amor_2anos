@@ -7,7 +7,7 @@ import { formatCardsToPages } from "./data/formatCards.js";
 
 import AlbumPage from "./AlbumPage/AlbumPage.jsx";
 
-function Pages() {
+function Pages({ reloadKey = 0 }) {
   const [pages, setPages] = useState([]);
   const [myCards, setMyCards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +15,8 @@ function Pages() {
   useEffect(() => {
     async function loadAlbumData() {
       try {
+        setLoading(true);
+
         const { cards, myCards } = await getAlbumData();
 
         const formattedPages = formatCardsToPages(cards);
@@ -33,25 +35,31 @@ function Pages() {
     }
 
     loadAlbumData();
-  }, []);
+  }, [reloadKey]);
 
   const stickersQuePossuo = new Set(
     myCards.map((item) => item.card_id)
   );
 
-  if (loading) {
+  if (loading && !reloadKey ) {
     return (
       <section className="album-gallery-section">
         <h1>Carregando álbum...</h1>
       </section>
     );
   }
+  
 
   return (
     <>
       {pages.map((page) => (
+        console.log("DEBUG PAGE RENDER:", {
+          pageId: page.id,
+          month: page.month
+        }),
         <AlbumPage
           key={page.id}
+
           page={page}
           stickersQuePossuo={stickersQuePossuo}
         />

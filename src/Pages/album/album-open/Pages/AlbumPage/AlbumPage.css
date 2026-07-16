@@ -56,3 +56,35 @@
 
   overflow: hidden;
 }
+
+/* ======================================================
+   TEMAS DAS PÁGINAS DO ÁLBUM
+
+   -theme-yellow-light: páginas normais ímpares
+   -theme-yellow-dark: páginas normais pares
+   -theme-bonus-black: páginas bônus/especiais
+====================================================== */
+
+.album-month-page.theme-yellow-light {
+  background-color: #d4ac85;
+  color: #070504;
+}
+
+.album-month-page.theme-yellow-dark {
+  background-color: #b98c69;
+  color: #070504;
+}
+
+
+
+
+
+
+.album-month-page.theme-forma {
+  background-color: #FFED00;
+  color: #000000;
+}
+
+.album-month-page.theme-bonus-black .album-sticker {
+  border-color: #d8b46c;
+}

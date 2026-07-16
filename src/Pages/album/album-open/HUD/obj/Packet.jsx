@@ -1,12 +1,15 @@
 import "../style/Packet.css";
+import PacketImg from "../imag/packet.svg";
 
-import Packet_img from "../imag/packet.svg";
-
-function Packet({ onClick , packets}) {
+function Packet({ onClick, packetsCount = 0 }) {
   return (
-    <button className="Packet_container" onClick={onClick}>
-      <h1>{packets.length}</h1>
-      <img src={Packet_img} alt="Pacotinho" />
+    <button
+      className="Packet_container"
+      onClick={onClick}
+      type="button"
+    >
+      <h1>{packetsCount}</h1>
+      <img src={PacketImg} alt="Pacotinho" />
     </button>
   );
 }

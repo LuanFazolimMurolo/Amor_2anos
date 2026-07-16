@@ -46,7 +46,7 @@ function Album() {
         coverRef={coverRef}
         galleryRef={galleryRef}
         setAlbumOpen={setAlbumOpen}
-
+        albumOpen={albumOpen}
       />
 
       

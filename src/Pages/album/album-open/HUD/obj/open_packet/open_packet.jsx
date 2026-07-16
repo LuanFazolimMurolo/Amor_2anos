@@ -1,11 +1,14 @@
 import "./open_packet.css";
-
-import { useRef } from "react";
+import { createPortal } from "react-dom";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 
 import PacketAnimation from "./packet_animation.jsx";
 
-export default function Open_packet({ packetImages = [], onOpened }) {
+export default function Open_packet({
+  onOpenPacketRequest,
+  onFinishClick,
+}) {
   const alreadyOpenedRef = useRef(false);
 
   const packetRef = useRef(null);
@@ -16,15 +19,27 @@ export default function Open_packet({ packetImages = [], onOpened }) {
   const lightCoreRef = useRef(null);
   const photosRef = useRef([]);
 
-  const photos = [
-    packetImages[0],
-    packetImages[1],
-    packetImages[2],
-    packetImages[3],
-  ];
+  const [animationFinished, setAnimationFinished] = useState(false);
+  const [loadingPacket, setLoadingPacket] = useState(false);
 
+  // ======================================================
+  // CARTAS QUE VÃO APARECER NA ANIMAÇÃO
+  //
+  // -Começa vazio
+  // -Quando clica para abrir, busca as cartas no Album_Open
+  // -Depois passa para o PacketAnimation
+  // ======================================================
+  const [packetCards, setPacketCards] = useState([]);
+
+  // ======================================================
+  // ANIMAÇÃO DO PACOTE
+  //
+  // -Só roda depois que as cartas já foram carregadas
+  // ======================================================
   function open_packets() {
-    if (alreadyOpenedRef.current) return;
+    if (alreadyOpenedRef.current) {
+      return;
+    }
 
     alreadyOpenedRef.current = true;
 
@@ -33,19 +48,15 @@ export default function Open_packet({ packetImages = [], onOpened }) {
         ease: "power3.out",
       },
       onComplete: () => {
-        if (onOpened) {
-          onOpened();
-        }
+        setAnimationFinished(true);
       },
     });
 
-    // Pequeno zoom inicial no pacote
     tl.to(packetRef.current, {
       scale: 1.08,
       duration: 0.25,
     });
 
-    // Tremida antes do rasgo
     tl.to(packetRef.current, {
       rotation: -2,
       duration: 0.08,
@@ -54,7 +65,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       ease: "power1.inOut",
     });
 
-    // Linha do rasgo aparecendo
     tl.to(
       tearLineRef.current,
       {
@@ -66,7 +76,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.1"
     );
 
-    // Luz começa a sair de dentro do rasgo
     tl.to(
       lightRef.current,
       {
@@ -78,7 +87,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.25"
     );
 
-    // Núcleo da luz fica mais forte
     tl.to(
       lightCoreRef.current,
       {
@@ -90,7 +98,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "<"
     );
 
-    // Abre a aba superior do pacote
     tl.to(
       packetFlapRef.current,
       {
@@ -104,7 +111,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.1"
     );
 
-    // Corpo do pacote abaixa um pouco
     tl.to(
       packetBodyRef.current,
       {
@@ -115,7 +121,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.5"
     );
 
-    // A luz explode um pouco mais
     tl.to(
       lightRef.current,
       {
@@ -127,7 +132,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.45"
     );
 
-    // Figurinhas aparecem saindo do centro
     tl.to(
       photosRef.current,
       {
@@ -141,7 +145,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.4"
     );
 
-    // Figurinhas se espalhando pela tela
     tl.to(
       photosRef.current[0],
       {
@@ -190,7 +193,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "<"
     );
 
-    // Queda leve, como se as figurinhas pousassem
     tl.to(
       photosRef.current,
       {
@@ -202,7 +204,6 @@ export default function Open_packet({ packetImages = [], onOpened }) {
       "-=0.2"
     );
 
-    // Pacote volta para escala normal
     tl.to(
       packetRef.current,
       {
@@ -214,14 +215,60 @@ export default function Open_packet({ packetImages = [], onOpened }) {
     );
   }
 
-  return (
+  // ======================================================
+  // CLIQUE NA TELA DO PACOTE
+  //
+  // Primeiro clique:
+  // -Chama o back-end
+  // -Recebe as cartas
+  // -Atualiza packetCards
+  // -Roda a animação
+  //
+  // Segundo clique depois da animação:
+  // -Chama o HUD para decidir se abre outro pacote ou fecha tudo
+  // ======================================================
+  async function handleClick() {
+    if (loadingPacket) {
+      return;
+    }
+
+    if (!alreadyOpenedRef.current) {
+      setLoadingPacket(true);
+
+      const cards = await onOpenPacketRequest?.();
+
+      if (!cards || cards.length === 0) {
+        console.log("Nenhuma carta nova disponível para mostrar.");
+
+        setLoadingPacket(false);
+
+        return;
+      }
+
+      setPacketCards(cards);
+
+      setLoadingPacket(false);
+
+      requestAnimationFrame(() => {
+        open_packets();
+      });
+
+      return;
+    }
+
+    if (animationFinished) {
+      onFinishClick?.();
+    }
+  }
+
+  return createPortal(
     <button
       className="Open_packet_container"
-      onClick={open_packets}
+      onClick={handleClick}
       type="button"
     >
       <PacketAnimation
-        photos={photos}
+        photos={packetCards}
         packetRef={packetRef}
         packetBodyRef={packetBodyRef}
         packetFlapRef={packetFlapRef}
@@ -230,6 +277,7 @@ export default function Open_packet({ packetImages = [], onOpened }) {
         lightCoreRef={lightCoreRef}
         photosRef={photosRef}
       />
-    </button>
+    </button>,
+    document.body
   );
 }

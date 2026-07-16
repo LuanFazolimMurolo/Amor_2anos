@@ -2,13 +2,15 @@ import express from "express";
 import cors from "cors";
 
 import { packets_engine, packets_used } from "./packets/calc_packets.js";
-
 import {
   getIloveyousData,
   getTodayIloveyou,
   getPackets,
   postPackets,
   deletePacketsByDates,
+  openNextPacket,
+  countAvailablePackets,
+  openNextPacketAndDrawCards,
 } from "./push_supabase.js";
 
 const app = express();
@@ -59,14 +61,16 @@ app.get("/api/iloveyous/today", async (req, res) => {
     });
   }
 });
-
 // ======================================================
 // ROTA: PEGAR PACKETS
-// Método: GET
 //
-// Essa rota apenas busca os packets.
-// Ela NÃO altera o banco.
-// Use essa no front quando você só quiser mostrar os dados.
+// Método:
+// -GET
+//
+// Faz:
+// -Busca todos os packets
+// -Não altera o banco
+// -Retorna também quantos packets ainda estão disponíveis
 // ======================================================
 app.get("/api/packets", async (req, res) => {
   try {
@@ -74,9 +78,12 @@ app.get("/api/packets", async (req, res) => {
 
     const ids_used = packets_used(data.packets);
 
+    const available_count = await countAvailablePackets();
+
     res.json({
       packets: data.packets,
       ids_used,
+      available_count,
     });
   } catch (error) {
     console.error("Erro ao ver packets:", error);
@@ -87,18 +94,6 @@ app.get("/api/packets", async (req, res) => {
     });
   }
 });
-
-// ======================================================
-// FUNÇÃO DE SINCRONIZAÇÃO DOS PACKETS
-//
-// Fluxo:
-// 1. Busca packets atuais do banco.
-// 2. Calcula quais datas faltam e quais sobraram.
-// 3. Deleta as datas que sobraram.
-// 4. Adiciona as datas que faltam.
-// 5. Busca o banco atualizado.
-// 6. Retorna tudo para o front.
-// ======================================================
 async function syncPacketsController(req, res) {
   try {
     // Busca packets atuais
@@ -157,6 +152,51 @@ app.post("/api/packets/sync", syncPacketsController);
 // ======================================================
 app.post("/api/packets", syncPacketsController);
 
+// ======================================================
+// ROTA: ABRIR PACKET E SORTEAR CARTAS
+//
+// Método:
+// -POST
+//
+// Faz:
+// -Busca 1 packet disponível
+// -Sorteia até 4 cartas que ainda não estão em album_my_cards
+// -Salva essas cartas em album_my_cards
+// -Marca o packet como opened/usado
+// -Retorna as cartas para o front
+// ======================================================
+app.post("/api/packets/open", async (req, res) => {
+  try {
+    const openedData = await openNextPacketAndDrawCards();
+
+    const updatedData = await getPackets();
+
+    const available_count = await countAvailablePackets();
+
+    res.json({
+      success: true,
+      message: openedData.message,
+
+      openedPacket: openedData.openedPacket,
+
+      cards: openedData.cards,
+
+      remainingPackets: openedData.remainingPackets,
+      available_count,
+
+      packets: updatedData.packets,
+    });
+  } catch (error) {
+    console.error("Erro ao abrir packet:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Erro ao abrir packet.",
+      details: error.message,
+      fullError: error,
+    });
+  }
+});
 // ======================================================
 // LIGANDO O BACK-END
 // ======================================================

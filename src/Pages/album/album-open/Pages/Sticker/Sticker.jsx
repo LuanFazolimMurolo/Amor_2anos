@@ -1,6 +1,13 @@
 import "./Sticker.css";
 
-import { supabase } from "../../../../../lib/supabaseClient.js";
+import StickerContent from "./StickerContent.jsx";
+
+// ======================================================
+// PEGANDO OS DADOS DA PROPORÇÃO DA FIGURINHA
+//
+// -Transforma "2:3", "3:2" ou "1:1" em:
+//  aspectRatio, orientação e largura
+// ======================================================
 function getProportionData(proportion) {
   const defaultProportion = "1:1";
   const value = proportion || defaultProportion;
@@ -40,17 +47,16 @@ function getProportionData(proportion) {
   };
 }
 
-function formatDateBR(dateString) {
-  if (!dateString) return "";
-
-  const [year, month, day] = dateString.split("-");
-
-  return `${day}/${month}/${year}`;
-}
-
-
 function Sticker({ sticker, desbloqueada }) {
   const proportionData = getProportionData(sticker.proportion);
+
+  // ======================================================
+  // ESTILO DA FIGURINHA DENTRO DO ÁLBUM
+  //
+  // -Posiciona a figurinha com x e y
+  // -Define largura pela proporção
+  // -Aplica rotação do banco
+  // ======================================================
   const stickerStyle = {
     left: `${sticker.x}%`,
     top: `${sticker.y}%`,
@@ -59,47 +65,15 @@ function Sticker({ sticker, desbloqueada }) {
     transform: `translate(-50%, -50%) rotate(${sticker.rotate ?? 0}deg)`,
   };
 
-  const publicUrl = sticker.image_path
-  ? supabase.storage
-      .from("album-cards")
-      .getPublicUrl(sticker.image_path).data.publicUrl
-  : null;
-
-  const imageUrl = publicUrl
-    ? `${publicUrl}?v=${sticker.id}-${Date.now()}`
-    : null;
-    console.log({
-    id: sticker.id,
-    path: sticker.image_path,
-    url: imageUrl,
-  });
-
-
   return (
     <article
       className={`album-sticker ${desbloqueada ? "unlocked" : "locked"}`}
       style={stickerStyle}
     >
-      <div className="sticker-date">
-        {desbloqueada ? formatDateBR(sticker.date) : "??/??/????"}
-      </div>
-
-      
-      <div className="sticker-image">
-        {desbloqueada && imageUrl ? (
-          <img
-            src={imageUrl}
-            alt=""
-            onError={() => console.log("Erro ao carregar imagem:", imageUrl)}
-          />
-        ) : (
-          <div className="sticker-placeholder">?</div>
-        )}
-      </div>
-
-      <div className="sticker-text">
-        {desbloqueada ? sticker.text : "Figurinha bloqueada"}
-      </div>
+      <StickerContent
+        sticker={sticker}
+        desbloqueada={desbloqueada}
+      />
     </article>
   );
 }

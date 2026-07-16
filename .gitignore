@@ -25,3 +25,7 @@ Thumbs.db
 .vscode/
 .idea/
 .vercel
+
+
+#seed
+album_seed/
