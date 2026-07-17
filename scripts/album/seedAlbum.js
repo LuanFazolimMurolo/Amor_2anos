@@ -92,13 +92,38 @@ async function uploadImageToStorage({
   return storagePath;
 }
 
+
+// ======================================================
+// BUSCANDO CARTAS JÁ EXISTENTES NO BANCO
+//
+// -Usa card_key como identificação fixa
+// -Serve para a seed não recalcular posição de cartas antigas
+// ======================================================
+async function getExistingCardsMap() {
+  const { data, error } = await supabaseAdmin
+    .from("album_cards")
+    .select("card_key, x, y, rotate");
+
+  if (error) {
+    throw error;
+  }
+
+  const existingCardsMap = new Map();
+
+  (data || []).forEach((card) => {
+    existingCardsMap.set(card.card_key, card);
+  });
+
+  return existingCardsMap;
+}
+
 // ======================================================
 // PROCESSANDO UMA PASTA DE PÁGINA
 //
 // Exemplo:
 // album_seed/julho_1.1/page.json
 // ======================================================
-async function processPageFolder({ folderName, folderPath }) {
+async function processPageFolder({ folderName, folderPath }, existingCardsMap) {
   const pageJsonPath = path.join(folderPath, "page.json");
 
   const existsPageJson = await fileExists(pageJsonPath);
@@ -172,6 +197,7 @@ async function processPageFolder({ folderName, folderPath }) {
       cardDate: parsedFile.cardDate,
       imageSlug: parsedFile.imageSlug,
     });
+    const existingCard = existingCardsMap.get(cardKey);
 
     const storagePath = `${page.page_id}/${cardConfig.file}`;
 
@@ -183,14 +209,35 @@ async function processPageFolder({ folderName, folderPath }) {
 
     const basePosition = baseTemplate[index];
 
-    const finalPosition = generateFinalPosition({
-      manualPosition: cardConfig.position,
-      basePosition,
-      jitter,
-      safeArea,
-      usedPositions,
-      minimumDistance: page.min_distance || 20,
-    });
+    let finalPosition;
+
+    // ======================================================
+    // SE A CARTA JÁ EXISTE, MANTÉM A POSIÇÃO DELA
+    //
+    // -Isso impede a seed de bagunçar páginas antigas
+    // -Apenas cartas novas recebem posição nova
+    // ======================================================
+    if (
+      existingCard &&
+      existingCard.x !== null &&
+      existingCard.y !== null &&
+      existingCard.rotate !== null
+    ) {
+      finalPosition = {
+        x: existingCard.x,
+        y: existingCard.y,
+        rotate: existingCard.rotate,
+      };
+    } else {
+      finalPosition = generateFinalPosition({
+        manualPosition: cardConfig.position,
+        basePosition,
+        jitter,
+        safeArea,
+        usedPositions,
+        minimumDistance: page.min_distance || 20,
+      });
+    }
 
     usedPositions.push(finalPosition);
 
@@ -268,10 +315,12 @@ async function main() {
       return;
     }
 
+    const existingCardsMap = await getExistingCardsMap();
+
     const allRows = [];
 
     for (const folder of pageFolders) {
-      const rows = await processPageFolder(folder);
+      const rows = await processPageFolder(folder, existingCardsMap);
 
       allRows.push(...rows);
     }

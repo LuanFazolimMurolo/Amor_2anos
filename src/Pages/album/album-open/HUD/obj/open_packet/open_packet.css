@@ -269,8 +269,9 @@
   left: 50%;
   top: 50%;
 
-  width: clamp(170px, 18vw, 280px);
-  height: clamp(230px, 25vw, 380px);
+  width: min(var(--packet-card-width, clamp(170px, 18vw, 280px)), 86vw);
+  aspect-ratio: var(--packet-card-aspect, 2 / 3);
+  height: auto;
 
   transform: translate(-50%, -50%) scale(0.15);
 
@@ -288,23 +289,54 @@
 
   pointer-events: none;
 }
-
 /* ======================================================
-   FIGURINHA DO PACOTE USANDO O MESMO CONTEÚDO DO ÁLBUM
+   FIGURINHA DO PACOTE USANDO O TEMA DA PÁGINA ORIGINAL
 
-   -Não usa position absolute interno do álbum
-   -Só usa o conteúdo visual: data, imagem e texto
+   -A carta recebe uma classe de tema:
+    theme-yellow-light
+    theme-yellow-dark
+    theme-forma
+    theme-bonus-black
+
+   -Essas classes definem --page-bg
+   -A figurinha usa --page-bg para clarear a cor
 ====================================================== */
+
+
 .packet_sticker_card {
+  --sticker-body: color-mix(
+    in srgb,
+    var(--page-bg, #d4ac85) var(--sticker-body-bg-amount, 75%),
+    white
+  );
+
+  --sticker-header-footer: color-mix(
+    in srgb,
+    var(--page-bg, #d4ac85) var(--sticker-strip-bg-amount, 55%),
+    white
+  );
+
+  --sticker-placeholder-bg: color-mix(
+    in srgb,
+    var(--page-bg, #d4ac85) var(--sticker-placeholder-bg-amount, 85%),
+    white
+  );
+
+  --sticker-border: #080604;
+  --sticker-shadow: #000000;
+  --sticker-text-color: var(--page-text, #070504);
+  --sticker-inner-border: #0000001d;
+
   width: 100%;
   height: 100%;
 
   box-sizing: border-box;
 
-  border: 5px solid #080604;
+  border: 5px solid var(--sticker-border);
   border-radius: 10px;
 
-  background-color: #d3ad8f;
+  background: var(--sticker-body);
+  color: var(--sticker-text-color);
 
   overflow: hidden;
 
@@ -312,13 +344,22 @@
   flex-direction: column;
 
   font-family: Arial, sans-serif;
+
+  box-shadow: 6px 6px 0 var(--sticker-shadow);
 }
 
 /* ======================================================
-   AJUSTE DO CONTEÚDO DA FIGURINHA DENTRO DO PACOTE
+   AJUSTE PARA CARTAS DE PÁGINAS ESCURAS
+====================================================== */
 
-   -Usa as mesmas classes internas do StickerContent
-   -Mas garante que o layout encaixe dentro da animação
+.packet_sticker_card.theme-bonus-black,
+.packet_sticker_card.theme-forma-black {
+  --sticker-text-color: #f3dfcb;
+  --sticker-inner-border: #ffffff22;
+}
+
+/* ======================================================
+   DATA DA FIGURINHA NO PACOTE
 ====================================================== */
 .packet_sticker_card .sticker-date {
   width: 100%;
@@ -328,9 +369,8 @@
   align-items: center;
   justify-content: center;
 
-  background-color: #d7b293;
-
-  color: #070504;
+  background: var(--sticker-header-footer);
+  color: var(--sticker-text-color);
 
   font-size: clamp(10px, 1.1vw, 15px);
   font-weight: 900;
@@ -344,7 +384,8 @@
   align-items: center;
   justify-content: center;
 
-  background-color: #cda687;
+  background: var(--sticker-body);
+  border: solid 1px var(--sticker-inner-border);
 
   overflow: hidden;
 }
@@ -366,28 +407,25 @@
   align-items: center;
   justify-content: center;
 
-  padding: 0 8px;
+  padding: 0 10px;
 
   box-sizing: border-box;
 
-  background-color: #d7b293;
+  background: var(--sticker-header-footer);
+  color: var(--sticker-text-color);
 
-  color: #070504;
-
-  font-size: clamp(10px, 1vw, 14px);
+  font-size: clamp(9px, 0.9vw, 13px);
   font-weight: 900;
   text-align: center;
+  line-height: 1.15;
 
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+
   overflow: hidden;
-  text-overflow: ellipsis;
 }
-/* ======================================================
-   PLACEHOLDER DA FIGURINHA DENTRO DO PACOTE
 
-   -Aparece quando a imagem não existe ou não carregou
-   -Fica como ponto de interrogação no centro
-====================================================== */
 .packet_sticker_card .sticker-placeholder {
   width: 100%;
   height: 100%;
@@ -399,22 +437,14 @@
   font-size: clamp(42px, 6vw, 90px);
   font-weight: 900;
 
-  color: rgba(58, 32, 18, 0.55);
-
-  background-color: #d3ad8f;
+  color: var(--sticker-text-color);
+  background: var(--sticker-placeholder-bg);
 }
 @media (max-width: 1000px) {
   .packet_wrapper {
     width: 62vw;
   }
 
-  .packet_photo {
-    width: 34vw;
-    height: 46vw;
-
-    max-width: 190px;
-    max-height: 260px;
-  }
 
   .packet_light {
     width: 220px;
@@ -427,8 +457,4 @@
     width: 68vw;
   }
 
-  .packet_photo {
-    width: 38vw;
-    height: 52vw;
-  }
 }

@@ -13,7 +13,8 @@
   "lint": "eslint .",
   "preview": "vite preview",
   "seed:album": "node scripts/album/seedAlbum.js",
-  "reroll:album": "node scripts/album/rerollAlbumLayout.js"
+  "reroll:album": "node scripts/album/rerollAlbumLayout.js",
+  "clear:album-storage": "node scripts/album/clearAlbumStorage.js"
   
   },
   "dependencies": {

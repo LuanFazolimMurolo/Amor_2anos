@@ -166,8 +166,12 @@ async function handlePacketOpened() {
         onPacketOpened={handlePacketOpened}
       />
 
-      <Pages reloadKey={albumReloadKey}/>
-    </div>
+      <Pages
+        reloadKey={albumReloadKey}
+        galleryRef={galleryRef}
+        albumOpen={albumOpen}
+      />    
+      </div>
   );
 }
 

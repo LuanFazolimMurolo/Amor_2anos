@@ -155,14 +155,14 @@ async function rerollPageLayout(seedPage) {
 
   const safeArea = page.safe_area || {
     min_x: 12,
-    max_x: 88,
+    max_x: 100,
     min_y: 18,
     max_y: 82,
   };
 
   const jitter = page.jitter || {
-    x: 6,
-    y: 5,
+    x: 10,
+    y: 9,
     rotate: 8,
   };
 
@@ -243,30 +243,32 @@ async function rerollPageLayout(seedPage) {
 // ======================================================
 async function main() {
   try {
-    const pages = await loadSeedPages();
 
-    if (pages.length === 0) {
-      console.log("Nenhuma página encontrada em album_seed.");
-      return;
-    }
+    while (true){
+      const pages = await loadSeedPages();
 
-    const selectedPages = await askPagesToReroll(pages);
+      if (pages.length === 0) {
+        console.log("Nenhuma página encontrada em album_seed.");
+        return;
+      }
 
-    console.log("");
-    console.log("Páginas selecionadas:");
-    selectedPages.forEach((item) => {
-      console.log(`- ${item.page.page_id}`);
-    });
+      const selectedPages = await askPagesToReroll(pages);
 
-    for (const page of selectedPages) {
-      await rerollPageLayout(page);
-    }
+      console.log("");
+      console.log("Páginas selecionadas:");
+      selectedPages.forEach((item) => {
+        console.log(`- ${item.page.page_id}`);
+      });
 
-    console.log("");
-    console.log("======================================================");
-    console.log("REROLL FINALIZADO COM SUCESSO");
-    console.log("======================================================");
-  } catch (error) {
+      for (const page of selectedPages) {
+        await rerollPageLayout(page);
+      }
+
+      console.log("");
+      console.log("======================================================");
+      console.log("REROLL FINALIZADO COM SUCESSO");
+      console.log("======================================================");
+  }} catch (error) {
     console.error("");
     console.error("ERRO AO REORGANIZAR LAYOUT:");
     console.error(error);

@@ -3,11 +3,12 @@ import "./AlbumPage.css";
 import Sticker from "../Sticker/Sticker.jsx";
 import { getPageThemeClass } from "../utils/getPageThemeClass.js";
 
-function AlbumPage({ page, stickersQuePossuo }) {
+function AlbumPage({ page, stickersQuePossuo, pageRef }) {
   const pageThemeClass = getPageThemeClass(page);
 
   return (
     <section
+      ref={pageRef}
       className={`album-gallery-section album-month-page ${pageThemeClass}`}
     >
       <div className="album-month-title">
@@ -15,8 +16,8 @@ function AlbumPage({ page, stickersQuePossuo }) {
 
         {page.age ? (
           <p>
-              {page.type === "month" ? `${page.age} ano` : page.age}
-            </p>
+            {page.type === "month" ? `${page.age} ano` : page.age}
+          </p>
         ) : null}
       </div>
 

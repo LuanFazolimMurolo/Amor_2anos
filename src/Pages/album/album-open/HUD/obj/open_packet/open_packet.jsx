@@ -1,6 +1,7 @@
 import "./open_packet.css";
+
 import { createPortal } from "react-dom";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 import PacketAnimation from "./packet_animation.jsx";
@@ -10,6 +11,7 @@ export default function Open_packet({
   onFinishClick,
 }) {
   const alreadyOpenedRef = useRef(false);
+  const isAnimatingRef = useRef(false);
 
   const packetRef = useRef(null);
   const packetBodyRef = useRef(null);
@@ -22,42 +24,172 @@ export default function Open_packet({
   const [animationFinished, setAnimationFinished] = useState(false);
   const [loadingPacket, setLoadingPacket] = useState(false);
 
-  // ======================================================
-  // CARTAS QUE VÃO APARECER NA ANIMAÇÃO
-  //
-  // -Começa vazio
-  // -Quando clica para abrir, busca as cartas no Album_Open
-  // -Depois passa para o PacketAnimation
-  // ======================================================
   const [packetCards, setPacketCards] = useState([]);
+
+  // ======================================================
+  // CONTROLE PARA RODAR A ANIMAÇÃO
+  //
+  // -Primeiro o React renderiza as cartas
+  // -Depois esse estado libera a animação
+  // -Evita o bug das cartas invisíveis
+  // ======================================================
+  const [shouldRunAnimation, setShouldRunAnimation] = useState(false);
+
+  // ======================================================
+  // RODANDO A ANIMAÇÃO APÓS O DOM ATUALIZAR
+  //
+  // -useLayoutEffect roda depois do React montar os elementos
+  // -Dois requestAnimationFrame dão tempo do navegador pintar o DOM
+  // ======================================================
+  useLayoutEffect(() => {
+    if (!shouldRunAnimation) {
+      return;
+    }
+
+    if (packetCards.length === 0) {
+      return;
+    }
+
+    const frame1 = requestAnimationFrame(() => {
+      const frame2 = requestAnimationFrame(() => {
+        open_packets();
+      });
+
+      return () => {
+        cancelAnimationFrame(frame2);
+      };
+    });
+
+    return () => {
+      cancelAnimationFrame(frame1);
+    };
+  }, [shouldRunAnimation, packetCards]);
 
   // ======================================================
   // ANIMAÇÃO DO PACOTE
   //
-  // -Só roda depois que as cartas já foram carregadas
+  // -Não usa alreadyOpenedRef aqui
+  // -Quem controla clique é o handleClick
+  // -Aqui a função só anima
   // ======================================================
   function open_packets() {
-    if (alreadyOpenedRef.current) {
+    if (isAnimatingRef.current) {
       return;
     }
 
-    alreadyOpenedRef.current = true;
+    const packet = packetRef.current;
+    const packetBody = packetBodyRef.current;
+    const packetFlap = packetFlapRef.current;
+    const tearLine = tearLineRef.current;
+    const light = lightRef.current;
+    const lightCore = lightCoreRef.current;
+
+    const photos = photosRef.current.filter(Boolean);
+
+    if (
+      !packet ||
+      !packetBody ||
+      !packetFlap ||
+      !tearLine ||
+      !light ||
+      !lightCore ||
+      photos.length === 0
+    ) {
+      console.log("Refs incompletos para animar o pacote:", {
+        packet,
+        packetBody,
+        packetFlap,
+        tearLine,
+        light,
+        lightCore,
+        photos,
+      });
+
+      setShouldRunAnimation(false);
+      return;
+    }
+
+    isAnimatingRef.current = true;
+
+    // ======================================================
+    // MATANDO ANIMAÇÕES ANTIGAS
+    //
+    // -Evita estado antigo do GSAP
+    // -Evita carta ficar presa com opacity 0
+    // ======================================================
+    gsap.killTweensOf([
+      packet,
+      packetBody,
+      packetFlap,
+      tearLine,
+      light,
+      lightCore,
+      ...photos,
+    ]);
+
+    // ======================================================
+    // RESET OBRIGATÓRIO
+    //
+    // -Esse reset é o que impede as cartas invisíveis
+    // -Toda abertura começa do mesmo estado
+    // ======================================================
+    gsap.set(packet, {
+      scale: 1,
+      rotation: 0,
+    });
+
+    gsap.set(packetBody, {
+      y: 0,
+      scale: 1,
+    });
+
+    gsap.set(packetFlap, {
+      rotateX: 0,
+      y: 0,
+      opacity: 1,
+      transformOrigin: "50% 100%",
+    });
+
+    gsap.set(tearLine, {
+      width: "0%",
+      opacity: 0,
+    });
+
+    gsap.set(light, {
+      opacity: 0,
+      scale: 0.2,
+    });
+
+    gsap.set(lightCore, {
+      opacity: 0,
+      scale: 0.4,
+    });
+
+    gsap.set(photos, {
+      opacity: 0,
+      scale: 0.15,
+      x: 0,
+      y: 0,
+      rotation: 0,
+    });
 
     const tl = gsap.timeline({
       defaults: {
         ease: "power3.out",
       },
       onComplete: () => {
+        isAnimatingRef.current = false;
         setAnimationFinished(true);
+        setShouldRunAnimation(false);
       },
     });
 
-    tl.to(packetRef.current, {
+    tl.to(packet, {
       scale: 1.08,
       duration: 0.25,
     });
 
-    tl.to(packetRef.current, {
+    tl.to(packet, {
       rotation: -2,
       duration: 0.08,
       repeat: 5,
@@ -66,7 +198,7 @@ export default function Open_packet({
     });
 
     tl.to(
-      tearLineRef.current,
+      tearLine,
       {
         width: "78%",
         opacity: 1,
@@ -77,7 +209,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      lightRef.current,
+      light,
       {
         opacity: 1,
         scale: 1,
@@ -88,7 +220,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      lightCoreRef.current,
+      lightCore,
       {
         opacity: 1,
         scale: 1.3,
@@ -99,7 +231,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      packetFlapRef.current,
+      packetFlap,
       {
         rotateX: -125,
         y: -42,
@@ -112,7 +244,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      packetBodyRef.current,
+      packetBody,
       {
         y: 35,
         scale: 0.96,
@@ -122,7 +254,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      lightRef.current,
+      light,
       {
         scale: 1.8,
         opacity: 0.9,
@@ -133,7 +265,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      photosRef.current,
+      photos,
       {
         opacity: 1,
         scale: 1,
@@ -145,56 +277,64 @@ export default function Open_packet({
       "-=0.4"
     );
 
-    tl.to(
-      photosRef.current[0],
-      {
-        x: "-38vw",
-        y: "-28vh",
-        rotation: -17,
-        duration: 0.85,
-        ease: "power3.out",
-      },
-      "-=0.15"
-    );
+    if (photos[0]) {
+      tl.to(
+        photos[0],
+        {
+          x: "-38vw",
+          y: "-28vh",
+          rotation: -17,
+          duration: 0.85,
+          ease: "power3.out",
+        },
+        "-=0.15"
+      );
+    }
+
+    if (photos[1]) {
+      tl.to(
+        photos[1],
+        {
+          x: "-12vw",
+          y: "-36vh",
+          rotation: 9,
+          duration: 0.85,
+          ease: "power3.out",
+        },
+        "<"
+      );
+    }
+
+    if (photos[2]) {
+      tl.to(
+        photos[2],
+        {
+          x: "16vw",
+          y: "-32vh",
+          rotation: -8,
+          duration: 0.85,
+          ease: "power3.out",
+        },
+        "<"
+      );
+    }
+
+    if (photos[3]) {
+      tl.to(
+        photos[3],
+        {
+          x: "38vw",
+          y: "-24vh",
+          rotation: 15,
+          duration: 0.85,
+          ease: "power3.out",
+        },
+        "<"
+      );
+    }
 
     tl.to(
-      photosRef.current[1],
-      {
-        x: "-12vw",
-        y: "-36vh",
-        rotation: 9,
-        duration: 0.85,
-        ease: "power3.out",
-      },
-      "<"
-    );
-
-    tl.to(
-      photosRef.current[2],
-      {
-        x: "16vw",
-        y: "-32vh",
-        rotation: -8,
-        duration: 0.85,
-        ease: "power3.out",
-      },
-      "<"
-    );
-
-    tl.to(
-      photosRef.current[3],
-      {
-        x: "38vw",
-        y: "-24vh",
-        rotation: 15,
-        duration: 0.85,
-        ease: "power3.out",
-      },
-      "<"
-    );
-
-    tl.to(
-      photosRef.current,
+      photos,
       {
         y: "+=35",
         duration: 0.45,
@@ -205,7 +345,7 @@ export default function Open_packet({
     );
 
     tl.to(
-      packetRef.current,
+      packet,
       {
         scale: 1,
         rotation: 0,
@@ -221,37 +361,51 @@ export default function Open_packet({
   // Primeiro clique:
   // -Chama o back-end
   // -Recebe as cartas
-  // -Atualiza packetCards
-  // -Roda a animação
+  // -Renderiza as cartas
+  // -Depois libera a animação
   //
-  // Segundo clique depois da animação:
-  // -Chama o HUD para decidir se abre outro pacote ou fecha tudo
+  // Segundo clique:
+  // -Finaliza tela do pacote
   // ======================================================
   async function handleClick() {
-    if (loadingPacket) {
+    if (loadingPacket || isAnimatingRef.current) {
       return;
     }
 
     if (!alreadyOpenedRef.current) {
-      setLoadingPacket(true);
+      try {
+        alreadyOpenedRef.current = true;
 
-      const cards = await onOpenPacketRequest?.();
+        setLoadingPacket(true);
+        setAnimationFinished(false);
+        setShouldRunAnimation(false);
 
-      if (!cards || cards.length === 0) {
-        console.log("Nenhuma carta nova disponível para mostrar.");
+        photosRef.current = [];
 
+        const cards = await onOpenPacketRequest?.();
+
+        if (!cards || cards.length === 0) {
+          console.log("Nenhuma carta nova disponível para mostrar.");
+
+          alreadyOpenedRef.current = false;
+          setLoadingPacket(false);
+
+          return;
+        }
+
+        setPacketCards(cards);
         setLoadingPacket(false);
 
-        return;
+        // Não chama open_packets direto aqui.
+        // O useLayoutEffect vai chamar quando o DOM estiver pronto.
+        setShouldRunAnimation(true);
+      } catch (error) {
+        console.error("Erro ao abrir pacote:", error);
+
+        alreadyOpenedRef.current = false;
+        setLoadingPacket(false);
+        setShouldRunAnimation(false);
       }
-
-      setPacketCards(cards);
-
-      setLoadingPacket(false);
-
-      requestAnimationFrame(() => {
-        open_packets();
-      });
 
       return;
     }

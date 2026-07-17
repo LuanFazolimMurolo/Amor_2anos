@@ -17,8 +17,103 @@
   font-family: "Chau Philomene One", sans-serif;
   font-size: 3rem;
 }
+/* ======================================================
+   ATALHOS DAS PÁGINAS DO ÁLBUM
+
+   -Funciona como minimapa do álbum
+   -Cada botão recebe a cor da própria página
+   -Usa as variáveis:
+    --page-bg
+    --page-text
+====================================================== */
+
+.album-page-shortcuts {
+  position: fixed;
+
+  right: 26px;
+  bottom: 34px;
+
+  z-index: 9000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  max-height: 55vh;
+
+  overflow-y: auto;
+
+  padding: 10px;
+
+  border-radius: 18px;
+
+  background: #0000001f;
+  border: 2px solid #7c654e;
+  backdrop-filter: blur(8px);
+
+  pointer-events: auto;
+}
+
+.album-page-shortcut {
+  border: 2px solid color-mix(
+    in srgb,
+    var(--page-text, #ffffff) 55%,
+    transparent
+  );
+  overscroll-behavior: contain;
+  border-radius: 999px;
+
+  padding: 7px 12px;
+
+  background: var(--page-bg, rgba(255, 255, 255, 0.16));
+  color: var(--page-text, #ffffff);
+
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+  overflow-y: visible;
 
 
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.album-page-shortcut:hover {
+  transform: translateX(-4px);
+
+  filter: brightness(1.12);
+
+  border-color: var(--page-text, #ffffff);
+}
+
+.album-page-shortcut.active {
+  transform: translateX(-4px) scale(1.04);
+
+  border-color: var(--page-text, #ffffff);
+
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+
+  filter: brightness(1.08);
+}
+
+/* ======================================================
+   ESCONDENDO NO CELULAR
+====================================================== */
+
+@media (max-width: 1000px) {
+  .album-page-shortcuts {
+    display: none;
+  }
+}
 /* =========================
    RESPONSIVO
 ========================= */

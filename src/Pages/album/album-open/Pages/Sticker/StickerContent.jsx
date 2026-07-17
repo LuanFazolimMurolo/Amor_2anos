@@ -57,12 +57,12 @@ function StickerContent({ sticker, desbloqueada }) {
   }, [sticker?.image_path]);
 
   const isUnlocked = desbloqueada === true;
-  console.log("DEBUG STICKER CONTENT:", {
+  /*console.log("DEBUG STICKER CONTENT:", {
     id: sticker?.id,
     text: sticker?.text,
     desbloqueada,
     isUnlocked,
-  });
+  });*/
   const canShowImage = isUnlocked && imageUrl && !imageError;
 
   return (
