@@ -1,16 +1,8 @@
 /* =========================
    FIGURINHA
 ========================= */
-
 .album-sticker {
   position: absolute;
-
-  /* ======================================================
-     CORES HERDADAS DA PÁGINA
-
-     -var(--page-bg) vem da página atual
-     -Cada tema pode controlar o quanto clareia
-  ====================================================== */
 
   --sticker-body: color-mix(
     in srgb,
@@ -37,7 +29,7 @@
 
   background: var(--sticker-body);
 
-  width: 230px;
+  width: var(--album-sticker-width-portrait, 140px);
 
   border: 4px solid var(--sticker-border);
   border-radius: 8px;
@@ -182,15 +174,14 @@
   .album-sticker {
     border-width: 3px;
     box-shadow: 4px 4px 0 var(--sticker-shadow);
-    width: 150px;
   }
 
   .sticker-date {
-    font-size: 0.45rem;
+    font-size: 0.65rem;
   }
 
   .sticker-text {
-    font-size: 0.5rem;
+    font-size: 0.6rem;
     padding: 4px;
   }
 }
@@ -199,15 +190,14 @@
   .album-sticker {
     border-width: 3px;
     box-shadow: 4px 4px 0 var(--sticker-shadow);
-    width: 100px;
   }
 
   .sticker-date {
-    font-size: 0.45rem;
+    font-size: 0.42rem;
   }
 
   .sticker-text {
-    font-size: 0.5rem;
+    font-size: 0.48rem;
     padding: 4px;
   }
 }

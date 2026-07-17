@@ -1,16 +1,20 @@
 import "../style/Packet.css";
+import { createPortal } from "react-dom";
+
 import PacketImg from "../imag/packet.svg";
 
 function Packet({ onClick, packetsCount = 0 }) {
-  return (
+  return createPortal(
     <button
       className="Packet_container"
       onClick={onClick}
       type="button"
     >
-      <h1>{packetsCount}</h1>
+      <span className="Packet_count">{packetsCount}</span>
+
       <img src={PacketImg} alt="Pacotinho" />
-    </button>
+    </button>,
+    document.body
   );
 }
 

@@ -52,6 +52,12 @@
   backdrop-filter: blur(8px);
 
   pointer-events: auto;
+  scrollbar-width: none;
+-ms-overflow-style: none;
+}
+.album-page-shortcuts::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .album-page-shortcut {
@@ -131,4 +137,39 @@
     box-sizing: border-box;
   }
 
- }
+
+}
+
+@media (max-height: 820px) {
+  .album-page-shortcuts {
+    right: 14px;
+    bottom: 16px;
+
+    max-height: 46vh;
+
+    gap: 5px;
+    padding: 7px;
+
+    border-radius: 14px;
+  }
+
+  .album-page-shortcut {
+    padding: 5px 10px;
+
+    font-size: 0.58rem;
+    border-width: 1px;
+  }
+}
+@media (max-width: 1200px) {
+  .album-page-shortcuts {
+    right: 10px;
+    bottom: 12px;
+
+    max-height: 42vh;
+  }
+
+  .album-page-shortcut {
+    padding: 5px 9px;
+    font-size: 0.55rem;
+  }
+}

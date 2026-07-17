@@ -1,75 +1,208 @@
-.Packet_container{
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    width: 200px;
-    rotate: -20deg;
-    right:-50px;
-    top: 60px;
-    pointer-events: auto;
-    cursor: pointer; 
-    background-color: transparent;
-    box-shadow: none;
-    border: none;
-    z-index: 9;
+/* ======================================================
+   PACOTINHO DO HUD
+
+   -Fica fixo na tela
+   -Não fica preso em uma página específica do álbum
+   -Fica meio colado na parede e diagonal
+   -Continua clicável
+====================================================== */
+
+.Packet_container {
+  position: fixed;
+
+  margin: 0;
+  padding: 0;
+
+  width: 200px;
+
+  right: -50px;
+  top: 60px;
+
+  pointer-events: auto;
+  cursor: pointer;
+
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+
+  z-index: 9200;
+
+  /* ======================================================
+     VARIÁVEIS DA ANIMAÇÃO
+
+     -Não usamos mais rotate separado
+     -Tudo fica dentro do transform
+     -Assim a animação não briga com a inclinação
+  ====================================================== */
+  --packet-rotate: -20deg;
+  --packet-hover-x: 0px;
+  --packet-scale: 1;
+
+  transform-origin: center center;
+  will-change: transform;
+
+  animation: packetShake 2s ease-in-out infinite;
 }
 
-.Packet_container img{
-    width: 100%;
+.Packet_container:hover {
+  --packet-hover-x: -8px;
+  --packet-scale: 1.04;
+
+  filter: brightness(1.08);
 }
 
-.Packet_container{
-      animation: packetShake 2s ease-in-out infinite;
+.Packet_container:active {
+  --packet-hover-x: -8px;
+  --packet-scale: 0.96;
 }
+
+.Packet_container img {
+  width: 100%;
+  height: auto;
+
+  display: block;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ======================================================
+   NÚMERO DE PACOTES
+
+   -Funciona se seu JSX usar span.Packet_count
+   -Também funciona se ainda estiver usando h1
+====================================================== */
+
+.Packet_count,
+.Packet_container h1 {
+  position: absolute;
+
+  top: -10px;
+  left: -10px;
+
+  width: 50px;
+  height: 50px;
+
+  margin: 0;
+  padding: 1px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: solid 1px #000000ad;
+  border-radius: 100px;
+
+  background-color: #b99168ad;
+  color: #070504;
+
+  text-align: center;
+  font-size: 2em;
+  font-weight: 900;
+
+  transform: rotate(-8deg);
+
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+/* ======================================================
+   ANIMAÇÃO LEVE DO PACOTINHO
+
+   -A rotação base é -20deg
+   -Ele só dá uma tremidinha de vez em quando
+   -Não zera mais a rotação
+====================================================== */
+
 @keyframes packetShake {
-  0%, 80%, 100% {
-    transform: translateY(0) rotate(0deg);
+  0%,
+  78%,
+  100% {
+    transform:
+      translateY(0)
+      translateX(var(--packet-hover-x))
+      rotate(var(--packet-rotate))
+      scale(var(--packet-scale));
   }
 
-  85% {
-    transform: translateY(-4px) rotate(-4deg);
+  82% {
+    transform:
+      translateY(-4px)
+      translateX(calc(var(--packet-hover-x) - 2px))
+      rotate(calc(var(--packet-rotate) - 3deg))
+      scale(var(--packet-scale));
+  }
+
+  86% {
+    transform:
+      translateY(3px)
+      translateX(calc(var(--packet-hover-x) + 2px))
+      rotate(calc(var(--packet-rotate) + 3deg))
+      scale(var(--packet-scale));
   }
 
   90% {
-    transform: translateY(2px) rotate(4deg);
+    transform:
+      translateY(-2px)
+      translateX(calc(var(--packet-hover-x) - 1px))
+      rotate(calc(var(--packet-rotate) - 2deg))
+      scale(var(--packet-scale));
   }
 
-  95% {
-    transform: translateY(-2px) rotate(-2deg);
+  94% {
+    transform:
+      translateY(1px)
+      translateX(calc(var(--packet-hover-x) + 1px))
+      rotate(calc(var(--packet-rotate) + 2deg))
+      scale(var(--packet-scale));
   }
 }
 
+/* ======================================================
+   NOTEBOOK / TELAS BAIXAS
+====================================================== */
 
+@media (max-height: 820px) {
+  .Packet_container {
+    top: 92px;
+    right: -14px;
 
-.Packet_container h1{
-    background-color: #b99168ad;
-    width: 100%;
-    height: 100%;
-    max-width: 50px;
-    max-height: 50px;
-    border-radius: 100px;
-    text-align: center;
-    font-size: 2em;
-    padding: 1px;
-    border: solid 1px #000000ad;
-    
+    width: clamp(68px, 6vw, 95px);
+
+    --packet-rotate: -25deg;
+  }
+
+  .Packet_count,
+  .Packet_container h1 {
+    width: 28px;
+    height: 28px;
+
+    font-size: 0.82rem;
+    border-width: 2px;
+  }
 }
 
+/* ======================================================
+   CELULAR
+====================================================== */
 
-@media (max-width: 1000px){
-    .Packet_container{
-        width: 100px;
-        right:-30px;
-        rotate: -15deg;
+@media (max-width: 900px) {
+  .Packet_container {
+    top: 82px;
+    right: -10px;
 
+    width: clamp(62px, 17vw, 90px);
 
-    }
-    
-    .Packet_container h1{
-        max-width: 30px;
-        max-height: 30px;
-        font-size: 1em;
+    --packet-rotate: -15deg;
+  }
 
-    
-    }
+  .Packet_count,
+  .Packet_container h1 {
+    width: 26px;
+    height: 26px;
+
+    font-size: 0.78rem;
+    border-width: 2px;
+  }
 }

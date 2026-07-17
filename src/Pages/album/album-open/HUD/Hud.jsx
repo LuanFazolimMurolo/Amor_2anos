@@ -207,7 +207,9 @@ const packetsDisponiveis = useMemo(() => {
     `!${openPacket} && ${packetsDisponiveis} > 0`,
     !openPacket && packetsDisponiveis > 0
   );
-
+  if (!albumOpen) {
+  return null;
+}
   return (
     <div className="hud-container">
       <Back

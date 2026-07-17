@@ -11,7 +11,8 @@ function Pages({ reloadKey = 0, galleryRef, albumOpen }) {
   const [pages, setPages] = useState([]);
   const [myCards, setMyCards] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const shortcutsRef = useRef(null);
+  const shortcutButtonRefs = useRef({});
   const [activePageId, setActivePageId] = useState(null);
   // ======================================================
   // SCROLL LIVRE EM CIMA DO MINIMAPA 
@@ -149,6 +150,44 @@ function Pages({ reloadKey = 0, galleryRef, albumOpen }) {
     };
   }, [pages, galleryRef]);
 
+
+  // ======================================================
+// FAZENDO A BARRINHA DA DIREITA ACOMPANHAR A PÁGINA ATIVA
+//
+// -O activePageId já muda quando você rola o álbum
+// -Agora a barrinha também desce/sobe sozinha
+// -Assim o botão ativo nunca fica escondido
+// ======================================================
+useEffect(() => {
+  if (!albumOpen) {
+    return;
+  }
+
+  if (!activePageId) {
+    return;
+  }
+
+  const shortcutsElement = shortcutsRef.current;
+  const activeButton = shortcutButtonRefs.current[activePageId];
+
+  if (!shortcutsElement || !activeButton) {
+    return;
+  }
+
+  const buttonCenter =
+    activeButton.offsetTop + activeButton.offsetHeight / 2;
+
+  const containerCenter =
+    shortcutsElement.clientHeight / 2;
+
+  const targetScrollTop =
+    buttonCenter - containerCenter;
+
+  shortcutsElement.scrollTo({
+    top: targetScrollTop,
+    behavior: "smooth",
+  });
+}, [activePageId, albumOpen]);
   // ======================================================
   // INDO DIRETO PARA UMA PÁGINA
   //
@@ -199,6 +238,7 @@ function Pages({ reloadKey = 0, galleryRef, albumOpen }) {
     {albumOpen
       ? createPortal(
          <nav
+          ref={shortcutsRef}
         className="album-page-shortcuts"
         onWheel={handleShortcutsWheel}
       >
@@ -207,18 +247,25 @@ function Pages({ reloadKey = 0, galleryRef, albumOpen }) {
           const isActive = activePageId === page.id;
 
           return (
-            <button
-              key={page.id}
-              type="button"
-              className={`album-page-shortcut ${pageThemeClass} ${
-                isActive ? "active" : ""
-              }`}
-              onClick={() => {
-                scrollToPage(page.id);
-              }}
-            >
-              {getPageButtonLabel(page)}
-            </button>
+           <button
+            key={page.id}
+            type="button"
+            ref={(element) => {
+              if (element) {
+                shortcutButtonRefs.current[page.id] = element;
+              } else {
+                delete shortcutButtonRefs.current[page.id];
+              }
+            }}
+            className={`album-page-shortcut ${pageThemeClass} ${
+              isActive ? "active" : ""
+            }`}
+            onClick={() => {
+              scrollToPage(page.id);
+            }}
+          >
+            {getPageButtonLabel(page)}
+          </button>
           );
         })}
       </nav>,

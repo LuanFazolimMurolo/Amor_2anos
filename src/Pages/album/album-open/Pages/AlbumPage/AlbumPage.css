@@ -12,6 +12,20 @@
   height: 100dvh;
 
   overflow: hidden;
+
+  /* ======================================================
+     TAMANHOS RESPONSIVOS DAS FIGURINHAS
+
+     -Esses valores ficam melhores para notebook 1366x768
+     -Não ficam gigantes no desktop
+     -Não ficam minúsculos no notebook
+  ====================================================== */
+
+  
+  --album-sticker-width-portrait: clamp(125px, 18vmin, 195px);
+  --album-sticker-width-landscape: clamp(185px, 26vmin, 295px);
+  --album-sticker-width-square: clamp(140px, 20vmin, 215px);
+
 }
 
 /* =========================
@@ -33,18 +47,17 @@
 
   z-index: 10;
 }
-
 .album-month-title h1 {
   margin: 0;
 
-  font-size: clamp(3rem, 8vw, 7rem);
+  font-size: clamp(3rem, 6vw, 5.8rem);
   line-height: 0.8;
 }
 
 .album-month-title p {
   margin: 0;
 
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-size: clamp(1rem, 2vw, 1.6rem);
   font-style: italic;
 }
 
@@ -147,4 +160,78 @@
 .theme-forma-black .album-sticker {
   --sticker-text-color: #f3dfcb;
   --sticker-inner-border: #ffffff22;
+}
+/* ======================================================
+   NOTEBOOK / TELAS BAIXAS
+
+   -Exemplo: 1366x768
+   -Reduz título e figurinhas
+====================================================== */
+
+@media (max-height: 820px) {
+  .album-month-page {
+     --album-sticker-width-portrait: clamp(100px, 20vmin, 170px);
+    --album-sticker-width-landscape: clamp(200px, 30vmin, 250px);
+    --album-sticker-width-square: clamp(135px, 19vmin, 200px);
+  }
+
+  .album-month-title {
+    height: 16%;
+  }
+
+  .album-stickers-area {
+    height: 84%;
+  }
+
+  .album-month-title h1 {
+    font-size: clamp(2.8rem, 5.8vw, 5rem);
+  }
+
+  .album-month-title p {
+    font-size: clamp(0.95rem, 1.8vw, 1.4rem);
+  }
+}
+/* ======================================================
+   DESKTOP GRANDE
+
+   -Só aumenta quando realmente tem espaço
+====================================================== */
+
+@media (min-width: 1500px) and (min-height: 850px) {
+  .album-month-page {
+    --album-sticker-width-portrait: clamp(105px, 12vmin, 185px);
+    --album-sticker-width-landscape: clamp(160px, 18vmin, 285px);
+    --album-sticker-width-square: clamp(120px, 14vmin, 210px);
+  }
+}
+
+/* ======================================================
+   CELULAR
+
+   -Reduz bastante
+   -Evita figurinha gigante
+====================================================== */
+
+@media (max-width: 900px) {
+  .album-month-page {
+    --album-sticker-width-portrait: clamp(70px, 23vw, 105px);
+    --album-sticker-width-landscape: clamp(100px, 34vw, 155px);
+    --album-sticker-width-square: clamp(78px, 26vw, 115px);
+  }
+
+  .album-month-title {
+    height: 15%;
+  }
+
+  .album-stickers-area {
+    height: 85%;
+  }
+
+  .album-month-title h1 {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
+
+  .album-month-title p {
+    font-size: clamp(0.9rem, 5vw, 1.4rem);
+  }
 }
