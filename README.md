@@ -1,7 +1,16 @@
-npm install
 
-cp .env.example .env.local - ou - copy .env.example .env.local
 
-add -key e -url supabase
+1. npm install
 
-npm run dev -- --host
+
+2.
+--windows
+copy .env.example .env.local
+
+--linux
+cp .env.example .env.local
+
+
+3.add -key e -url supabase
+
+npm run "dev:host
