@@ -36,13 +36,6 @@ function formatCardsToStickers(cards = []) {
       text: card.text || card.caption,
       proportion: card.proportion,
 
-      // ======================================================
-      // DADOS DA PÁGINA ORIGINAL
-      //
-      // -theme vem do banco
-      // -order_index vem do banco
-      // -Isso é usado só para pegar a classe visual correta
-      // ======================================================
       theme: card.theme || "auto",
       orderIndex: card.orderIndex || card.order_index || 1,
     };

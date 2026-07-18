@@ -13,8 +13,15 @@ const DEFAULT_COLORS = [
 export default function Fireworks({
   active = true,
 
-  interval = 900,
-  particlesAmount = Math.random() * 1000,
+  interval = 500,
+
+  // ======================================================
+  // IMPORTANTE
+  //
+  // -Não use Math.random() * 1000 aqui
+  // -Isso pode criar partículas demais e travar o navegador
+  // ======================================================
+  particlesAmount = 500,
 
   minHeight = 60,
   maxHeightPercent = 0.45,
@@ -31,6 +38,9 @@ export default function Fireworks({
   gravity = 0.04,
   friction = 0.98,
   fadeSpeed = 0.010,
+
+  maxParticles = 1200,
+  maxFireworks = 8,
 
   colors = DEFAULT_COLORS,
   backgroundFade = "rgba(0, 0, 0, 0.15)",
@@ -54,23 +64,32 @@ export default function Fireworks({
     gravity,
     friction,
     fadeSpeed,
+    maxParticles,
+    maxFireworks,
     colors,
     backgroundFade,
   };
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+      return;
+    }
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext("2d");
 
-    let animationId;
-    let intervalId;
+    let animationId = null;
+    let intervalId = null;
 
     let particles = [];
     let fireworks = [];
+
+    let isRunning = false;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -83,6 +102,7 @@ export default function Fireworks({
 
     function getRandomColor() {
       const { colors } = configRef.current;
+
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
@@ -118,7 +138,9 @@ export default function Fireworks({
       draw() {
         const { rocketSize } = configRef.current;
 
-        if (this.exploded) return;
+        if (this.exploded) {
+          return;
+        }
 
         ctx.beginPath();
         ctx.arc(this.x, this.y, rocketSize, 0, Math.PI * 2);
@@ -135,6 +157,7 @@ export default function Fireworks({
         this.y = y;
 
         const angle = Math.random() * Math.PI * 2;
+
         const speed = randomBetween(
           config.particleMinSpeed,
           config.particleMaxSpeed
@@ -181,15 +204,33 @@ export default function Fireworks({
     }
 
     function createExplosion(x, y, color) {
-      const { particlesAmount } = configRef.current;
+      const { particlesAmount, maxParticles } = configRef.current;
 
       for (let i = 0; i < particlesAmount; i++) {
         particles.push(new Particle(x, y, color));
       }
+
+      // ======================================================
+      // LIMITE DE SEGURANÇA
+      //
+      // -Mesmo se der algum pico
+      // -Nunca deixa milhares de partículas acumularem
+      // ======================================================
+      if (particles.length > maxParticles) {
+        particles = particles.slice(-maxParticles);
+      }
     }
 
     function animate() {
-      const { backgroundFade } = configRef.current;
+      if (!isRunning) {
+        return;
+      }
+
+      if (document.hidden) {
+        return;
+      }
+
+      const { backgroundFade, maxFireworks, maxParticles } = configRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -209,26 +250,98 @@ export default function Fireworks({
       fireworks = fireworks.filter((firework) => !firework.exploded);
       particles = particles.filter((particle) => particle.alpha > 0);
 
+      if (fireworks.length > maxFireworks) {
+        fireworks = fireworks.slice(-maxFireworks);
+      }
+
+      if (particles.length > maxParticles) {
+        particles = particles.slice(-maxParticles);
+      }
+
       animationId = requestAnimationFrame(animate);
     }
 
+    function startFireworks() {
+      if (isRunning) {
+        return;
+      }
+
+      if (document.hidden) {
+        return;
+      }
+
+      isRunning = true;
+
+      resizeCanvas();
+
+      intervalId = setInterval(() => {
+        if (document.hidden) {
+          return;
+        }
+
+        fireworks.push(new Firework());
+
+        if (fireworks.length > configRef.current.maxFireworks) {
+          fireworks = fireworks.slice(-configRef.current.maxFireworks);
+        }
+      }, configRef.current.interval);
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    function stopFireworks() {
+      isRunning = false;
+
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+
+      animationId = null;
+      intervalId = null;
+
+      // ======================================================
+      // LIMPA TUDO AO SAIR DA ABA
+      //
+      // -Não deixa foguete acumulado
+      // -Não deixa partícula acumulada
+      // ======================================================
+      particles = [];
+      fireworks = [];
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        stopFireworks();
+        return;
+      }
+
+      startFireworks();
+    }
+
     resizeCanvas();
+
     window.addEventListener("resize", resizeCanvas);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    intervalId = setInterval(() => {
-      fireworks.push(new Firework());
-    }, configRef.current.interval);
-
-    animate();
+    startFireworks();
 
     return () => {
-      cancelAnimationFrame(animationId);
-      clearInterval(intervalId);
+      stopFireworks();
+
       window.removeEventListener("resize", resizeCanvas);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [active]);
 
-  if (!active) return null;
+  if (!active) {
+    return null;
+  }
 
   return <canvas ref={canvasRef} className="fireworks-canvas" />;
 }

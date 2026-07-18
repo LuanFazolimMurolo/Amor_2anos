@@ -36,7 +36,7 @@
 
   overflow: hidden;
 
-  box-shadow: 6px 6px 0 var(--sticker-shadow);
+  box-shadow: 6px 6px 0 var(--page-text);
 
   color: var(--sticker-text-color);
 
@@ -183,6 +183,186 @@
   .sticker-text {
     font-size: 0.6rem;
     padding: 4px;
+  }
+}
+
+
+
+/* ======================================================
+   FIGURINHAS LENDÁRIAS
+
+   -Borda dourada
+   -Brilho de carta rara
+   -Placeholder bloqueado diferente
+   -Selo de raridade
+====================================================== */
+
+.theme-legendary .album-sticker {
+  --sticker-border: #d4af37;
+  --sticker-shadow: rgba(0, 0, 0, 0.85);
+  --sticker-text-color: #120d05;
+  --sticker-inner-border: rgba(255, 231, 163, 0.28);
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 231, 163, 0.22) 0%, transparent 38%),
+    linear-gradient(180deg, #2c2210 0%, #15110a 48%, #080604 100%);
+
+  border-color: #d4af37;
+
+  box-shadow:
+    0 0 8px rgba(255, 223, 126, 0.55),
+    0 0 22px rgba(212, 175, 55, 0.28),
+    7px 7px 0 rgba(0, 0, 0, 0.85);
+
+  overflow: hidden;
+
+  animation: legendaryCardPulse 3.4s ease-in-out infinite;
+}
+
+/* conteúdo acima do brilho */
+.theme-legendary .album-sticker > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* selo lendário */
+.theme-legendary .album-sticker::before {
+  content: "★";
+
+  position: absolute;
+
+  top: 2px;
+  right: 7px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #fff0b8;
+  border-radius: 999px;
+
+  background:
+    radial-gradient(circle at 35% 30%, #fff4c7 0%, #d4af37 45%, #7b4f0d 100%);
+
+  color: #120d05;
+
+  font-size: 0.95rem;
+  font-weight: 900;
+
+  box-shadow:
+    0 0 8px rgba(255, 231, 163, 0.75),
+    0 0 18px rgba(212, 175, 55, 0.35);
+
+  z-index: 4;
+
+  pointer-events: none;
+}
+
+/* brilho passando na figurinha */
+.theme-legendary .album-sticker::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -80%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.55) 48%,
+      rgba(255, 231, 163, 0.55) 50%,
+      transparent 57%,
+      transparent 100%
+    );
+
+  transform: translateX(-45%) rotate(12deg);
+
+  animation: legendaryCardShine 4.6s ease-in-out infinite;
+
+  z-index: 3;
+
+  pointer-events: none;
+}
+
+/* data e texto */
+.theme-legendary .sticker-date,
+.theme-legendary .sticker-text {
+  background:
+  linear-gradient(10deg, #c5a642 20%, #b18b10 45%, #83570c 100%);
+
+  color: #120d05;
+
+  text-shadow: none;
+
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* área da imagem */
+.theme-legendary .sticker-image {
+  background:
+    radial-gradient(circle at center, rgba(255, 231, 163, 0.18), transparent 55%),
+    #0b0703;
+}
+
+/* placeholder bloqueado lendário */
+.theme-legendary .album-sticker.locked {
+  opacity: 0.95;
+  filter: none;
+}
+
+.theme-legendary .album-sticker.locked .sticker-placeholder {
+  background:
+    radial-gradient(circle at center, rgba(212, 175, 55, 0.26) 0%, transparent 48%),
+    linear-gradient(180deg, #171006 0%, #050403 100%);
+
+  color: #ffdf7e;
+
+  text-shadow:
+    0 0 8px rgba(255, 223, 126, 0.75),
+    0 0 22px rgba(212, 175, 55, 0.35);
+}
+
+/* ======================================================
+   ANIMAÇÕES DAS FIGURINHAS LENDÁRIAS
+====================================================== */
+
+@keyframes legendaryCardPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(255, 223, 126, 0.42),
+      0 0 22px rgba(212, 175, 55, 0.22),
+      7px 7px 0 rgba(0, 0, 0, 0.85);
+  }
+
+  50% {
+    box-shadow:
+      0 0 12px rgba(255, 231, 163, 0.78),
+      0 0 34px rgba(212, 175, 55, 0.38),
+      7px 7px 0 rgba(0, 0, 0, 0.85);
+  }
+}
+
+@keyframes legendaryCardShine {
+  0%,
+  62%,
+  100% {
+    transform: translateX(-65%) rotate(12deg);
+    opacity: 0;
+  }
+
+  72% {
+    opacity: 0.85;
+  }
+
+  84% {
+    transform: translateX(65%) rotate(12deg);
+    opacity: 0;
   }
 }
 

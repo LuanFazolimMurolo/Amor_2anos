@@ -1,10 +1,11 @@
 import "./AlbumPage.css";
-
+import formaImg from "./img_forma.png"
 import Sticker from "../Sticker/Sticker.jsx";
 import { getPageThemeClass } from "../utils/getPageThemeClass.js";
 
 function AlbumPage({ page, stickersQuePossuo, pageRef }) {
   const pageThemeClass = getPageThemeClass(page);
+
 
   return (
     <section
@@ -12,7 +13,17 @@ function AlbumPage({ page, stickersQuePossuo, pageRef }) {
       className={`album-gallery-section album-month-page ${pageThemeClass}`}
     >
       <div className="album-month-title">
-        <h1>{page.month}</h1>
+        <div className="album-month-title-row">
+          <h1>{page.month}</h1>
+
+          {page.theme === "forma" || page.theme === "forma_black" ? (
+            <img
+              src={formaImg}
+              alt=""
+              className="album-title-forma-img"
+            />
+          ) : null}
+        </div>
 
         {page.age ? (
           <p>
@@ -34,6 +45,7 @@ function AlbumPage({ page, stickersQuePossuo, pageRef }) {
           );
         })}
       </div>
+
     </section>
   );
 }

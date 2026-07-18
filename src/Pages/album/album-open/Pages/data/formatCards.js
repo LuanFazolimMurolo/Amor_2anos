@@ -39,16 +39,35 @@ export function formatCardsToPages(cards = []) {
 
   const pages = Array.from(pagesMap.values());
 
-  // ======================================================
-  // ORDENANDO AS PÁGINAS
-  //
-  // -Julho orderIndex 1
-  // -Agosto orderIndex 2
-  // -Setembro orderIndex 3
-  // ======================================================
   pages.sort((pageA, pageB) => {
     return pageA.orderIndex - pageB.orderIndex;
   });
 
-  return pages;
+  // ======================================================
+  // CRIANDO ÍNDICE VISUAL SÓ PARA PÁGINAS DE MÊS
+  //
+  // -Páginas especiais não entram na alternância
+  // -Exemplo:
+  //  lendarias = especial, não conta
+  //  julho     = mês 1 claro
+  //  agosto    = mês 2 escuro
+  //  setembro  = mês 3 claro
+  // ======================================================
+
+  let monthColorIndex = 0;
+
+  const pagesWithMonthIndex = pages.map((page) => {
+    if (page.type === "month") {
+      monthColorIndex += 1;
+
+      return {
+        ...page,
+        monthColorIndex,
+      };
+    }
+
+    return page;
+  });
+
+  return pagesWithMonthIndex;
 }

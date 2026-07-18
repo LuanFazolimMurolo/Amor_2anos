@@ -112,6 +112,113 @@
 }
 
 /* ======================================================
+   BOTÃO LENDÁRIO NO MINIMAPA
+
+   -Dá destaque para a página LENDÁRIAS
+   -Mantém o botão com aparência de raridade
+====================================================== */
+
+.album-page-shortcut.theme-legendary {
+  position: relative;
+
+  overflow: hidden;
+
+  min-height: 32px;
+
+  padding: 8px 14px;
+
+  background:
+    radial-gradient(circle at top, rgba(255, 231, 163, 0.35), transparent 55%),
+    linear-gradient(180deg, #1b1308 0%, #080604 100%);
+
+  color: #ffdf7e;
+
+  border-color: #d4af37;
+
+  text-shadow:
+    0 0 6px rgba(255, 223, 126, 0.55);
+
+  box-shadow:
+    0 0 8px rgba(212, 175, 55, 0.35),
+    3px 3px 0 rgba(0, 0, 0, 0.75);
+
+  animation: legendaryShortcutPulse 3s ease-in-out infinite;
+}
+
+/* brilho passando no botão do minimapa */
+.album-page-shortcut.theme-legendary::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -80%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      transparent 42%,
+      rgba(255, 255, 255, 0.45) 49%,
+      rgba(255, 231, 163, 0.6) 51%,
+      transparent 58%,
+      transparent 100%
+    );
+
+  transform: translateX(-65%) rotate(12deg);
+
+  animation: legendaryShortcutShine 4.2s ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+.album-page-shortcut.theme-legendary.active {
+  transform: translateX(-8px) scale(1.06);
+
+  border-color: #ffe7a3;
+
+  box-shadow:
+    0 0 12px rgba(255, 223, 126, 0.75),
+    0 0 28px rgba(212, 175, 55, 0.35),
+    5px 5px 0 rgba(0, 0, 0, 0.85);
+
+  filter: brightness(1.12);
+}
+
+@keyframes legendaryShortcutPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(212, 175, 55, 0.28),
+      3px 3px 0 rgba(0, 0, 0, 0.75);
+  }
+
+  50% {
+    box-shadow:
+      0 0 12px rgba(255, 223, 126, 0.6),
+      0 0 24px rgba(212, 175, 55, 0.32),
+      3px 3px 0 rgba(0, 0, 0, 0.75);
+  }
+}
+
+@keyframes legendaryShortcutShine {
+  0%,
+  60%,
+  100% {
+    transform: translateX(-70%) rotate(12deg);
+    opacity: 0;
+  }
+
+  72% {
+    opacity: 0.8;
+  }
+
+  84% {
+    transform: translateX(70%) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+/* ======================================================
    ESCONDENDO NO CELULAR
 ====================================================== */
 

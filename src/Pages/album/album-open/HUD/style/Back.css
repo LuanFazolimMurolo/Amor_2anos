@@ -16,7 +16,7 @@
   color: #000;
   font-family: "Chau Philomene One", sans-serif;
   font-size: 2rem;
-
+  text-shadow:#d8b46c 0px 0px 5px;
   cursor: pointer;
 
   pointer-events: auto;

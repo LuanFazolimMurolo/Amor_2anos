@@ -3,23 +3,35 @@
 //
 // Regra:
 //
-// -Se theme for "auto":
-//  orderIndex ímpar = amarelo claro
-//  orderIndex par = amarelo escuro
+// -Se for página de mês e theme for "auto":
+//  alterna usando monthColorIndex
 //
-// -Se theme for manual:
-//  "bonus_black" vira "theme-bonus-black"
+// -Se for página especial:
+//  usa o theme manual
+//
+// Exemplos:
+// -theme auto + mês 1 = theme-yellow-light
+// -theme auto + mês 2 = theme-yellow-dark
+// -theme legendary    = theme-legendary
+// -theme forma        = theme-forma
 // ======================================================
+
 export function getPageThemeClass(page) {
   const theme = page?.theme || "auto";
-  const orderIndex = Number(page?.orderIndex || 1);
+  const pageType = page?.type || page?.page_type || "month";
 
   if (theme !== "auto") {
     return `theme-${theme.replaceAll("_", "-")}`;
   }
 
-  if (orderIndex % 2 === 0) {
-    return "theme-yellow-dark";
+  if (pageType === "month") {
+    const monthColorIndex = Number(page?.monthColorIndex || 1);
+
+    if (monthColorIndex % 2 === 0) {
+      return "theme-yellow-dark";
+    }
+
+    return "theme-yellow-light";
   }
 
   return "theme-yellow-light";

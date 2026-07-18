@@ -440,6 +440,190 @@
   color: var(--sticker-text-color);
   background: var(--sticker-placeholder-bg);
 }
+
+
+
+/* ======================================================
+   FIGURINHA LENDÁRIA DENTRO DO PACOTINHO
+
+   -Esse bloco é separado do Sticker.css
+   -Porque no pacote a classe é .packet_sticker_card
+   -No álbum a classe é .album-sticker
+====================================================== */
+
+.packet_sticker_card.theme-legendary {
+  --sticker-border: #d4af37;
+  --sticker-shadow: rgba(0, 0, 0, 0.85);
+  --sticker-text-color: #120d05;
+  --sticker-inner-border: rgba(255, 231, 163, 0.28);
+
+  position: relative;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 231, 163, 0.22) 0%, transparent 38%),
+    linear-gradient(180deg, #2c2210 0%, #15110a 48%, #080604 100%);
+
+  border-color: #d4af37;
+
+  box-shadow:
+    0 0 10px rgba(255, 223, 126, 0.62),
+    0 0 28px rgba(212, 175, 55, 0.35),
+    7px 7px 0 rgba(0, 0, 0, 0.85);
+
+  overflow: hidden;
+
+  animation: legendaryPacketCardPulse 3.4s ease-in-out infinite;
+}
+
+/* conteúdo da carta acima do brilho */
+.packet_sticker_card.theme-legendary > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ======================================================
+   ESTRELA LENDÁRIA NO PACOTE
+====================================================== */
+
+.packet_sticker_card.theme-legendary::before {
+  content: "★";
+
+  position: absolute;
+
+  top: 2px;
+  right: 7px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #fff0b8;
+  border-radius: 999px;
+
+  background:
+    radial-gradient(circle at 35% 30%, #fff4c7 0%, #d4af37 45%, #7b4f0d 100%);
+
+  color: #120d05;
+
+  font-size: 0.95rem;
+  font-weight: 900;
+
+  box-shadow:
+    0 0 8px rgba(255, 231, 163, 0.75),
+    0 0 18px rgba(212, 175, 55, 0.35);
+
+  z-index: 5;
+
+  pointer-events: none;
+}
+
+/* ======================================================
+   BRILHO PASSANDO NA CARTA LENDÁRIA DO PACOTE
+====================================================== */
+
+.packet_sticker_card.theme-legendary::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -80%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      transparent 43%,
+      rgba(255, 255, 255, 0.55) 48%,
+      rgba(255, 231, 163, 0.55) 50%,
+      transparent 57%,
+      transparent 100%
+    );
+
+  transform: translateX(-45%) rotate(12deg);
+
+  animation: legendaryPacketCardShine 4.6s ease-in-out infinite;
+
+  z-index: 4;
+
+  pointer-events: none;
+}
+
+/* data e texto da carta lendária no pacote */
+.packet_sticker_card.theme-legendary .sticker-date,
+.packet_sticker_card.theme-legendary .sticker-text {
+  background:
+    linear-gradient(10deg, #c5a642 20%, #b18b10 45%, #83570c 100%);
+
+  color: #120d05;
+
+  text-shadow: none;
+
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* área da imagem no pacote */
+.packet_sticker_card.theme-legendary .sticker-image {
+  background:
+    radial-gradient(circle at center, rgba(255, 231, 163, 0.18), transparent 55%),
+    #0b0703;
+
+  border-color: rgba(255, 231, 163, 0.35);
+}
+
+/* placeholder lendário no pacote */
+.packet_sticker_card.theme-legendary .sticker-placeholder {
+  background:
+    radial-gradient(circle at center, rgba(212, 175, 55, 0.26) 0%, transparent 48%),
+    linear-gradient(180deg, #171006 0%, #050403 100%);
+
+  color: #ffdf7e;
+
+  text-shadow:
+    0 0 8px rgba(255, 223, 126, 0.75),
+    0 0 22px rgba(212, 175, 55, 0.35);
+}
+
+/* ======================================================
+   ANIMAÇÕES DA CARTA LENDÁRIA NO PACOTE
+====================================================== */
+
+@keyframes legendaryPacketCardPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(255, 223, 126, 0.45),
+      0 0 28px rgba(212, 175, 55, 0.25),
+      7px 7px 0 rgba(0, 0, 0, 0.85);
+  }
+
+  50% {
+    box-shadow:
+      0 0 16px rgba(255, 231, 163, 0.85),
+      0 0 42px rgba(212, 175, 55, 0.45),
+      7px 7px 0 rgba(0, 0, 0, 0.85);
+  }
+}
+
+@keyframes legendaryPacketCardShine {
+  0%,
+  62%,
+  100% {
+    transform: translateX(-65%) rotate(12deg);
+    opacity: 0;
+  }
+
+  72% {
+    opacity: 0.85;
+  }
+
+  84% {
+    transform: translateX(65%) rotate(12deg);
+    opacity: 0;
+  }
+}
 @media (max-width: 1000px) {
   .packet_wrapper {
     width: 62vw;
