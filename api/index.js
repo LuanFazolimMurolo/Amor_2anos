@@ -198,8 +198,20 @@ app.post("/api/packets/open", async (req, res) => {
   }
 });
 // ======================================================
-// LIGANDO O BACK-END
+// INICIANDO SERVIDOR LOCALMENTE
+//
+// -No seu computador, continua rodando na porta 3001
+// -Na Vercel, o Express vira uma função serverless
 // ======================================================
-app.listen(PORT, () => {
-  console.log(`Back-end rodando em http://localhost:${PORT}`);
-});
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+}
+
+// ======================================================
+// EXPORTANDO APP PARA A VERCEL
+// ======================================================
+
+export default app;
