@@ -1,7 +1,7 @@
 export function getDateAndCountdown() {
   const now = new Date();
   const currentYear = now.getFullYear();
-  const day_NIV = 18;
+  const day_NIV = 19;
   const baseDate = new Date(2024, 6, day_NIV, 0, 0, 0); // 18/07/2024
 
   // Calcula próximo dia 18 (de qualquer mês)

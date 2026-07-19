@@ -265,12 +265,18 @@ export async function postPackets(datesToAdd) {
     };
   });
 
+  // ======================================================
+  // IMPORTANTE:
+  //
+  // Aqui precisa ser INSERT, não UPSERT.
+  //
+  // Motivo:
+  // -No dia 18/07 podem existir 5 packets com a mesma data
+  // -Se usar upsert com onConflict created_at, ele ignora duplicados
+  // ======================================================
   const { data, error } = await supabaseAdmin
     .from("packets")
-    .upsert(rowsToInsert, {
-      onConflict: "created_at",
-      ignoreDuplicates: true,
-    })
+    .insert(rowsToInsert)
     .select("id, used, created_at");
 
   if (error) {
@@ -282,7 +288,6 @@ export async function postPackets(datesToAdd) {
     message: "Packets adicionados com sucesso.",
   };
 }
-
 // ======================================================
 // DELETA PACKETS QUE NÃO DEVERIAM MAIS EXISTIR
 //

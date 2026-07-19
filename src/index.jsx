@@ -25,9 +25,9 @@ function App() {
         <Album/>
       </section>
 
-      <section className="section">
+      {/*<section className="section">
         <Carta/>
-      </section>
+      </section>*/}
 
     </div>
   )

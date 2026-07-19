@@ -4,7 +4,7 @@
 //
 // Aqui você muda a data inicial dos pacotinhos.
 // Exemplo:
-// 18-05-2026
+// 18-07-2026
 // ======================================================
 const DATE_BASE = "18-07-2026";
 
@@ -32,20 +32,43 @@ function getTodayBR() {
 }
 
 // ======================================================
-// GERA TODAS AS DATAS QUE DEVERIAM EXISTIR
+// QUANTIDADE DE PACOTES POR DATA
+//
+// Regra:
+//
+// -Todo dia 18 ganha 1 pacote
+// -Todo dia 18/07 ganha 5 pacotes
 //
 // Exemplo:
-// DATE_BASE = 18-05-2026
+// 18-07-2026 = 5 pacotes
+// 18-08-2026 = 1 pacote
+// 18-09-2026 = 1 pacote
+// ======================================================
+function getPacketsAmountForDate(day, month) {
+  const isJuly18 = day === 18 && month === 7;
+
+  if (isJuly18) {
+    return 8;
+  }
+
+  return 1;
+}
+
+// ======================================================
+// GERA TODAS AS DATAS QUE DEVERIAM EXISTIR
 //
-// Se hoje for 30-06-2026, retorna:
-// [
-//   "18-05-2026",
-//   "18-06-2026"
-// ]
+// Importante:
 //
-// Se hoje for 17-06-2026, retorna:
+// -Se uma data deveria ter 5 pacotes, ela aparece 5 vezes
+//
+// Exemplo:
 // [
-//   "18-05-2026"
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-08-2026"
 // ]
 // ======================================================
 function dates_all() {
@@ -75,7 +98,16 @@ function dates_all() {
       const dayFormatted = String(baseDay).padStart(2, "0");
       const monthFormatted = String(currentMonth).padStart(2, "0");
 
-      datesList.push(`${dayFormatted}-${monthFormatted}-${currentYear}`);
+      const formattedDate = `${dayFormatted}-${monthFormatted}-${currentYear}`;
+
+      const packetsAmount = getPacketsAmountForDate(
+        baseDay,
+        currentMonth
+      );
+
+      for (let index = 0; index < packetsAmount; index++) {
+        datesList.push(formattedDate);
+      }
     }
 
     currentMonth++;
@@ -103,8 +135,6 @@ function formatDateToBR(date) {
     return null;
   }
 
-  // Segurança caso algum dia venha timestamp:
-  // 2026-05-18T00:00:00.000Z
   const cleanDate = date.split("T")[0];
 
   const [year, month, day] = cleanDate.split("-");
@@ -113,29 +143,86 @@ function formatDateToBR(date) {
 }
 
 // ======================================================
+// CONTA QUANTAS VEZES CADA DATA APARECE
+//
+// Exemplo:
+// [
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-08-2026"
+// ]
+//
+// Vira:
+// {
+//   "18-07-2026": 2,
+//   "18-08-2026": 1
+// }
+// ======================================================
+function countDates(dates = []) {
+  const datesCount = {};
+
+  dates.forEach((date) => {
+    datesCount[date] = (datesCount[date] || 0) + 1;
+  });
+
+  return datesCount;
+}
+
+// ======================================================
 // CALCULA O QUE PRECISA ADICIONAR E DELETAR
 //
-// datesExpected = datas que deveriam existir
-// datesExisting = datas que já existem no banco
+// Agora suporta datas repetidas.
 //
-// Retorna:
-// dates_to_add: datas que faltam no banco
-// dates_to_delete: datas que existem no banco, mas não deveriam existir
+// Exemplo:
+// Esperado:
+// 18-07-2026 aparece 5 vezes
+//
+// Existente:
+// 18-07-2026 aparece 1 vez
+//
+// Resultado:
+// dates_to_add = [
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-07-2026",
+//   "18-07-2026"
+// ]
 // ======================================================
 function calc_sync(datesExpected, datesExisting) {
   const dates_to_add = [];
   const dates_to_delete = [];
 
-  // Verifica quais datas deveriam existir, mas ainda não existem
-  datesExpected.forEach((date) => {
-    if (!datesExisting.includes(date)) {
-      dates_to_add.push(date);
+  const expectedCount = countDates(datesExpected);
+  const existingCount = countDates(datesExisting);
+
+  // ======================================================
+  // ADICIONAR DATAS QUE ESTÃO FALTANDO
+  // ======================================================
+  Object.keys(expectedCount).forEach((date) => {
+    const expectedAmount = expectedCount[date] || 0;
+    const existingAmount = existingCount[date] || 0;
+
+    const missingAmount = expectedAmount - existingAmount;
+
+    if (missingAmount > 0) {
+      for (let index = 0; index < missingAmount; index++) {
+        dates_to_add.push(date);
+      }
     }
   });
 
-  // Verifica quais datas existem, mas não deveriam existir
-  datesExisting.forEach((date) => {
-    if (!datesExpected.includes(date)) {
+  // ======================================================
+  // DELETAR DATAS QUE NÃO DEVERIAM EXISTIR
+  //
+  // Importante:
+  // -Aqui deletamos apenas datas completamente inválidas.
+  // -Não tentamos deletar "excesso" da mesma data, porque seu sistema
+  //  atual de delete provavelmente deleta pela data inteira.
+  // ======================================================
+  Object.keys(existingCount).forEach((date) => {
+    const expectedAmount = expectedCount[date] || 0;
+
+    if (expectedAmount === 0) {
       dates_to_delete.push(date);
     }
   });
@@ -143,6 +230,8 @@ function calc_sync(datesExpected, datesExisting) {
   return {
     dates_to_add,
     dates_to_delete,
+    expectedCount,
+    existingCount,
   };
 }
 
@@ -174,6 +263,8 @@ export function packets_engine(data) {
 
   console.log("DATAS QUE DEVERIAM EXISTIR:", list_dates_all);
   console.log("DATAS QUE JÁ EXISTEM:", list_dates_has);
+  console.log("CONTAGEM ESPERADA:", syncResult.expectedCount);
+  console.log("CONTAGEM EXISTENTE:", syncResult.existingCount);
   console.log("DATAS PARA ADICIONAR:", syncResult.dates_to_add);
   console.log("DATAS PARA DELETAR:", syncResult.dates_to_delete);
 
@@ -187,7 +278,11 @@ export function packets_engine(data) {
 
 // ======================================================
 // PEGA OS IDS DOS PACKETS QUE ESTÃO COM used = true
-// Útil para mandar para o front e liberar páginas/pacotinhos.
+//
+// No seu sistema:
+//
+// used true  = pacote fechado/disponível
+// used false = pacote aberto/usado
 // ======================================================
 export function packets_used(data) {
   const ids_used = [];
@@ -200,7 +295,7 @@ export function packets_used(data) {
     }
   });
 
-  console.log("IDS USADOS:", ids_used);
+  console.log("IDS DISPONÍVEIS:", ids_used);
 
   return ids_used;
 }

@@ -172,7 +172,7 @@
 }
 
 .album-page-shortcut.theme-legendary.active {
-  transform: translateX(-8px) scale(1.06);
+  transform: scale(1.06);
 
   border-color: #ffe7a3;
 
