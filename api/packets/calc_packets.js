@@ -51,7 +51,7 @@ function getPacketsAmountForDate(day, month) {
     return 8;
   }
 
-  return 1;
+  return 3;
 }
 
 // ======================================================

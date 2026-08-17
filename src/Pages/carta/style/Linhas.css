@@ -1,0 +1,66 @@
+/* ======================================================
+   LINHAS DA CARTA COMO HUD
+
+   -Ficam fixas na tela
+   -Só aparecem quando o componente Linhas está montado
+   -A animação continua sendo feita pelo useLineAnimation
+====================================================== */
+
+.carta-lines-layer {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100dvh;
+
+  overflow: hidden;
+
+  pointer-events: none;
+  z-index: 8;
+
+}
+
+.carta-line {
+  position: absolute;
+
+  width: 950px;
+
+  pointer-events: none;
+  will-change: clip-path;
+
+}
+
+.carta-line-left {
+  left: -200px;
+  top: -160px;
+
+  transform: rotate(-40deg) scaleX(-1);
+}
+
+.carta-line-right {
+  right: -350px;
+  bottom: -300px;
+  transform: rotate(160deg)scaleX(-1);
+}
+
+@media (max-width: 1000px) {
+  .carta-line {
+    width: 620px;
+  }
+
+ 
+
+  .carta-line-right {
+
+    right: -200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carta-line {
+    width: 560px;
+  }
+
+
+}

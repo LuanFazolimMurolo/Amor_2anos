@@ -14,10 +14,12 @@
 
   width: 100%;
   height: 100dvh;
-
   overflow: hidden;
 
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
   background: #d4ac85;
+  z-index: 100;
 }
 
 
